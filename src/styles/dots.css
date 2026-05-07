@@ -1,0 +1,14 @@
+:root {
+  --dots: var(--color-zinc-200);
+}
+
+.dark {
+  --dots: var(--color-zinc-900);
+}
+
+@layer base {
+  body {
+    background-image: radial-gradient(circle, var(--dots) 1px, transparent 1px);
+    background-size: 15px 15px;
+  }
+}

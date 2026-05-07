@@ -1,0 +1,121 @@
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <canvas id="galaxy-background" class="block h-full w-full"></canvas>
+</div>
+
+<script>
+  const canvas = document.getElementById(
+    "galaxy-background",
+  ) as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+
+  interface Star {
+    x: number;
+    y: number;
+    radius: number;
+    baseAlpha: number;
+    driftX: number;
+    driftY: number;
+    // primary slow oscillation
+    twinkleSpeed: number;
+    twinkleOffset: number;
+    // secondary faster flicker for realism
+    flickerSpeed: number;
+    flickerOffset: number;
+    // per-star random pause: some stars stay dim for a while then brighten
+    burstPhase: number;
+    burstSpeed: number;
+    // wiggle amplitude and phase per axis
+    wiggleAmpX: number;
+    wiggleAmpY: number;
+    wiggleSpeedX: number;
+    wiggleSpeedY: number;
+    wiggleOffsetX: number;
+    wiggleOffsetY: number;
+  }
+
+  const STAR_COUNT = 320;
+  let stars: Star[] = [];
+  let w = 0;
+  let h = 0;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function createStars() {
+    stars = Array.from({ length: STAR_COUNT }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      radius: Math.random() * 1.8 + 0.3,
+      baseAlpha: Math.random() * 0.5 + 0.3,
+      driftX: (Math.random() - 0.5) * 0.15,
+      driftY: (Math.random() - 0.5) * 0.1,
+      twinkleSpeed: Math.random() * 0.6 + 0.2,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      flickerSpeed: Math.random() * 3 + 1.5,
+      flickerOffset: Math.random() * Math.PI * 2,
+      burstPhase: Math.random() * Math.PI * 2,
+      burstSpeed: Math.random() * 0.15 + 0.05,
+      wiggleAmpX: Math.random() * 1.2 + 0.4,
+      wiggleAmpY: Math.random() * 1.2 + 0.4,
+      wiggleSpeedX: Math.random() * 1.5 + 0.5,
+      wiggleSpeedY: Math.random() * 1.5 + 0.5,
+      wiggleOffsetX: Math.random() * Math.PI * 2,
+      wiggleOffsetY: Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function draw(t: number) {
+    const isDark = document.documentElement.classList.contains("dark");
+    ctx.clearRect(0, 0, w, h);
+
+    for (const s of stars) {
+      const slow =
+        Math.sin(t * 0.001 * s.twinkleSpeed + s.twinkleOffset) * 0.35 + 0.65;
+      const fast =
+        Math.sin(t * 0.001 * s.flickerSpeed + s.flickerOffset) * 0.15 + 0.85;
+      // burst: occasionally dips to near-zero then recovers — like real scintillation
+      const burstRaw = Math.sin(t * 0.001 * s.burstSpeed + s.burstPhase);
+      const burst = burstRaw > 0.7 ? 1 : 0.3 + 0.7 * ((burstRaw + 1) / 1.7);
+      const alpha = Math.min(1, s.baseAlpha * slow * fast * burst);
+
+      const driftedX = s.x + s.driftX * t * 0.01;
+      const driftedY = s.y + s.driftY * t * 0.01;
+      const wx =
+        Math.sin(t * 0.001 * s.wiggleSpeedX + s.wiggleOffsetX) * s.wiggleAmpX;
+      const wy =
+        Math.sin(t * 0.001 * s.wiggleSpeedY + s.wiggleOffsetY) * s.wiggleAmpY;
+      let x = ((driftedX + wx) % (w + 20)) - 10;
+      let y = ((driftedY + wy) % (h + 20)) - 10;
+      if (x < 0) x += w;
+      if (y < 0) y += h;
+
+      ctx.beginPath();
+      ctx.arc(x, y, s.radius, 0, Math.PI * 2);
+      ctx.fillStyle = isDark
+        ? `rgba(255,255,255,${alpha})`
+        : `rgba(15,15,30,${alpha * 0.7})`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  function init() {
+    resize();
+    createStars();
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener("resize", () => {
+    resize();
+    createStars();
+  });
+
+  init();
+</script>

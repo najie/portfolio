@@ -1,0 +1,24 @@
+.text-special {
+  background: linear-gradient(
+    135deg,
+    oklch(0.7 0.17 295) 0%,
+    oklch(0.7 0.18 350) 40%,
+    oklch(0.75 0.14 230) 80%,
+    oklch(0.7 0.17 295) 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}

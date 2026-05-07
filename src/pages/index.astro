@@ -1,17 +1,22 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { Button } from "@/components/ui/button"
+import Header from "@/components/header.astro"
+import { IndexHero } from "@/components/index-hero"
+import { ProjectsSection } from "@/components/projects-section"
+import { SkillsSection } from "@/components/skills-section"
 ---
 
 <Layout>
-  <div class="flex min-h-svh p-6">
-    <div class="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-      <div>
-        <h1 class="font-medium">Project ready!</h1>
-        <p>You may now add components and start building.</p>
-        <p>We've already added the button component for you.</p>
-        <Button client:load className="mt-2">Button</Button>
-      </div>
+  <main class="min-h-screen">
+    <div class="fixed top-16 z-99 flex w-full justify-center">
+      <Header />
     </div>
-  </div>
+
+    <div class="z-1 min-h-0 w-full px-4 py-4 md:px-8 md:py-8">
+      <IndexHero client:load />
+
+      <!-- <SkillsSection client:load /> -->
+      <ProjectsSection client:load />
+    </div>
+  </main>
 </Layout>
