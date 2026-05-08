@@ -1,36 +1,38 @@
-# Astro + React + TypeScript + shadcn/ui
+# Personal Portfolio
 
-This is a template for a new Astro project with React, TypeScript, and shadcn/ui.
+Here is my portfolio built to showcase custom-made projects, creative experiments, and technical expertise — all wrapped in a polished, performant UI.
 
-## Adding components
+You're welcome to explore the code and use it as a reference for your own projects if you see some stuff you like.
 
-To add components to your app, run the following command:
+## Tech Stack
+
+- **Framework:** Astro v6 with React islands
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **3D / Visuals:** Three.js (react-three-fiber), OGL, custom shaders
+- **Language:** TypeScript
+- **Tooling:** ESLint, Prettier, Playwright
+
+## Sections
+
+- **Hero** — Animated introduction with custom cursor, typewriter effects, and a galaxy background
+- **Projects** — Hand-crafted frontend experiments and side projects built for fun
+- **About** — A section to get to know me better
+- **Contact** — Reach out for collaborations or just to say hi
+
+## Getting Started
 
 ```bash
-npx shadcn@latest add button
+pnpm install
+pnpm dev
 ```
 
-This will place the ui components in the `src/components` directory.
+## Scripts
 
-## Using components
-
-To use the components in your app, import them in an `.astro` file:
-
-```astro
----
-import { Button } from "@/components/ui/button"
----
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Astro App</title>
-  </head>
-  <body>
-    <div class="grid h-screen place-items-center content-center">
-      <Button>Button</Button>
-    </div>
-  </body>
-</html>
-```
+| Command          | Description                   |
+| ---------------- | ----------------------------- |
+| `pnpm dev`       | Start the dev server          |
+| `pnpm build`     | Production build              |
+| `pnpm preview`   | Preview the production build  |
+| `pnpm lint`      | Run ESLint                    |
+| `pnpm format`    | Format with Prettier          |
+| `pnpm typecheck` | Type-check with `astro check` |

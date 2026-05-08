@@ -1,5 +1,5 @@
 export * from "./react-bits"
-export * from "./space-hero/space-hero"
 export * from "./theme-toggle.tsx"
 export * from "./typewriter-heading"
 export * from "./header.astro"
+export * from "./project-layout-header.astro"

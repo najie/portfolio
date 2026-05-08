@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
+import "@/styles/cursor.css"
+
 const pointerTargetSelector = [
   "a",
   "button",
@@ -96,8 +98,14 @@ function CustomCursor() {
     document.addEventListener("mouseout", handleMouseOut)
     window.addEventListener("mousedown", handleMouseDown)
     window.addEventListener("mouseup", handleMouseUp)
-    document.documentElement.addEventListener("mouseleave", handleMouseLeaveWindow)
-    document.documentElement.addEventListener("mouseenter", handleMouseEnterWindow)
+    document.documentElement.addEventListener(
+      "mouseleave",
+      handleMouseLeaveWindow
+    )
+    document.documentElement.addEventListener(
+      "mouseenter",
+      handleMouseEnterWindow
+    )
 
     return () => {
       if (frameRef.current !== null) {
@@ -108,8 +116,14 @@ function CustomCursor() {
       document.removeEventListener("mouseout", handleMouseOut)
       window.removeEventListener("mousedown", handleMouseDown)
       window.removeEventListener("mouseup", handleMouseUp)
-      document.documentElement.removeEventListener("mouseleave", handleMouseLeaveWindow)
-      document.documentElement.removeEventListener("mouseenter", handleMouseEnterWindow)
+      document.documentElement.removeEventListener(
+        "mouseleave",
+        handleMouseLeaveWindow
+      )
+      document.documentElement.removeEventListener(
+        "mouseenter",
+        handleMouseEnterWindow
+      )
     }
   }, [isFinePointer])
 
@@ -133,7 +147,10 @@ function CustomCursor() {
           opacity: ringOpacity,
         }}
       />
-      <span className="custom-cursor-dot" style={{ transform: `translate(-50%, -50%) scale(${dotScale})` }} />
+      <span
+        className="custom-cursor-dot"
+        style={{ transform: `translate(-50%, -50%) scale(${dotScale})` }}
+      />
     </div>
   )
 }

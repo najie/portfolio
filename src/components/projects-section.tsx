@@ -10,6 +10,7 @@ import {
 } from "./ui/card"
 import { AspectRatio } from "./ui/aspect-ratio"
 import { Button } from "./ui/button"
+import { projects } from "@/projects/registry"
 
 const ProjectsSection = () => {
   return (
@@ -26,24 +27,30 @@ const ProjectsSection = () => {
         </hgroup>
       </div>
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Pomodoro Timer</CardTitle>
-            <CardDescription>Mobile haptics & animations ✨</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AspectRatio ratio={16 / 9}>
-              <img
-                src="https://picsum.photos/400/225"
-                alt="Pomodoro Timer"
-                className="rounded"
-              />
-            </AspectRatio>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full">View Project</Button>
-          </CardFooter>
-        </Card>
+        {projects.map((project) => (
+          <Card key={project.slug}>
+            <CardHeader>
+              <CardTitle>{project.title}</CardTitle>
+              <CardDescription>{project.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {project.thumbnail && (
+                <AspectRatio ratio={16 / 9}>
+                  <img
+                    src={project.thumbnail}
+                    alt={project.title}
+                    className="rounded"
+                  />
+                </AspectRatio>
+              )}
+            </CardContent>
+            <CardFooter>
+              <a href={`/projects/${project.slug}`} className="w-full">
+                <Button className="w-full">View Project</Button>
+              </a>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </section>
   )
