@@ -1,8 +1,8 @@
 ---
 import "@/styles/global.css"
-import GalaxyBackground from "@/components/galaxy-background.astro"
 import { CustomCursor } from "@/components/custom-cursor"
-import Header from "@/components/header.astro"
+import { Toaster } from "@/components/ui/sonner"
+import MainLayoutHeader from "@/components/main-layout-header.astro"
 ---
 
 <html lang="en">
@@ -24,9 +24,12 @@ import Header from "@/components/header.astro"
     </script>
   </head>
   <body>
-    <Header />
+    <MainLayoutHeader />
 
     <CustomCursor client:load />
-    <slot />
+    <Toaster client:load />
+    <main class="mx-auto max-w-7xl">
+      <slot />
+    </main>
   </body>
 </html>
