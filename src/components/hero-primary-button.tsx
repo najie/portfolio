@@ -1,12 +1,24 @@
 import { useDevice } from "@/hooks/use-device"
 import { BorderGlow } from "./react-bits"
 import { useDarkMode } from "./dark-mode-provider"
+import { useState } from "react"
 
 const HeroPrimaryButton = () => {
   const dark = useDarkMode()
   const { isMobile } = useDevice()
+  const [isPressed, setIsPressed] = useState(false)
 
-  console.log(isMobile)
+  const handleMouseDown = () => {
+    setIsPressed(true)
+  }
+
+  const handleMouseUp = () => {
+    setIsPressed(false)
+  }
+
+  const handleClick = () => {
+    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })
+  }
 
   return (
     <BorderGlow
@@ -20,10 +32,17 @@ const HeroPrimaryButton = () => {
       coneSpread={10}
       animated={true}
       colors={["#c084fc", "#f472b6", "#38bdf8"]}
-      className="2-auto mx-auto mt-16 w-fit"
+      className={`2-auto mx-auto mt-16 w-fit transition-transform duration-300 ease-in-out ${isPressed ? "translate-y-1 scale-95" : ""}`}
       isMobile={isMobile}
     >
-      <button type="button" className="px-8 py-6">
+      <button
+        type="button"
+        className="px-8 py-6"
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
         Explore what I can do
       </button>
     </BorderGlow>

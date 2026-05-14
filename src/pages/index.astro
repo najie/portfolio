@@ -3,6 +3,7 @@ import Layout from "@/layouts/main.astro"
 import { ProjectsSection, IndexHero, ContactSection } from "@/components"
 // import { SkillsSection } from "@/components/skills-section"
 import HeadlineSection from "@/components/headline-section.astro"
+import ExperienceSection from "@/components/experience-section.astro"
 ---
 
 <Layout>
@@ -10,9 +11,10 @@ import HeadlineSection from "@/components/headline-section.astro"
     <div class="z-1 min-h-0 w-full px-4 py-4 md:px-8 md:py-8">
       <IndexHero client:load />
 
-      <div class="mt-32 flex flex-col gap-32">
+      <div class="my-32 flex flex-col gap-32">
         <!-- <SkillsSection client:load /> -->
         <HeadlineSection />
+        <ExperienceSection />
         <ProjectsSection client:load />
         <ContactSection client:load />
       </div>

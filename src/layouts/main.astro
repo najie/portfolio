@@ -2,7 +2,7 @@
 import "@/styles/global.css"
 import { CustomCursor } from "@/components/custom-cursor"
 import { Toaster } from "@/components/ui/sonner"
-import MainLayoutHeader from "@/components/main-layout-header.astro"
+import { MainLayoutHeader } from "@/components/main-layout-header"
 ---
 
 <html lang="en">
@@ -24,7 +24,7 @@ import MainLayoutHeader from "@/components/main-layout-header.astro"
     </script>
   </head>
   <body>
-    <MainLayoutHeader />
+    <MainLayoutHeader client:load />
 
     <CustomCursor client:load />
     <Toaster client:load />

@@ -7,7 +7,13 @@ function ThemeToggle() {
   const [dark, setDark] = useState(false)
 
   useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"))
+    const stored = localStorage.getItem("theme")
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches
+    const resolved = stored === "dark" || (!stored && prefersDark)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from localStorage + prefers-color-scheme (same rules as layout script)
+    setDark(resolved)
   }, [])
 
   function toggle() {

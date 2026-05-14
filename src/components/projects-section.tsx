@@ -24,7 +24,7 @@ interface Line {
 
 const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
-  const hgroupRef = useRef<HTMLDivElement>(null)
+  const hgroupRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const [lines, setLines] = useState<Line[]>([])
 
@@ -65,10 +65,11 @@ const ProjectsSection = () => {
 
   return (
     <section
+      id="projects"
       ref={sectionRef}
-      className="relative flex w-full items-center justify-between"
+      className="relative flex w-full scroll-mt-[160px] flex-col content-center justify-between lg:flex-row"
     >
-      <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+      <svg className="pointer-events-none absolute inset-0 hidden h-full w-full overflow-visible lg:block">
         <style>{`
           @keyframes draw-line {
             from { clip-path: inset(0 100% 0 0); }
@@ -93,19 +94,20 @@ const ProjectsSection = () => {
         ))}
       </svg>
 
-      <div className="flex items-center">
+      <div className="mb-8 flex items-center lg:mb-0">
         <HugeiconsIcon
           icon={Blockchain03Icon}
-          className="size-24 animate-glow-wander"
+          className="hidden size-24 animate-glow-wander sm:block"
         />
 
-        <div className="ml-8 h-16 w-1 rotate-15 rounded-full bg-foreground" />
-        <div ref={hgroupRef} className="ml-8">
-          <h2 className="text-5xl font-bold">Projects</h2>
+        <div className="ml-8 hidden h-16 w-1 rotate-15 rounded-full bg-foreground sm:block" />
+        <hgroup ref={hgroupRef} className="sm:ml-8">
+          <h2 className="text-3xl font-bold sm:text-5xl">Projects</h2>
           <h3 className="text-special">Made with passion and care</h3>
-        </div>
+        </hgroup>
       </div>
-      <div className="flex w-[400px] flex-col gap-4">
+
+      <div className="flex w-full flex-col gap-4 lg:w-[480px]">
         {projects.map((project, i) => (
           <Card
             key={project.slug}

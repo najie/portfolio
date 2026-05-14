@@ -1,0 +1,147 @@
+---
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Briefcase02Icon,
+  Building03Icon,
+  Location01Icon,
+  Calendar03Icon,
+} from "@hugeicons/core-free-icons"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card"
+import { SpotlightCard } from "@/components/react-bits"
+import { Badge } from "@/components/ui/badge"
+
+const experiences = [
+  {
+    company: "Studio JL",
+    role: "Senior Frontend Developer",
+    period: "2026 – Present",
+    location: "Paris",
+    summary: "Freelance frontend developer for various clients.",
+    highlights: [
+      "Build various projects for clients with care and attention to detail.",
+      "More infos soon...",
+    ],
+    stack: [
+      "React",
+      "TypeScript",
+      "Cursor",
+      "Agentic",
+      "Astro",
+      "Tailwind CSS",
+      "Shadcn",
+    ],
+  },
+  {
+    company: "AVIV Group",
+    role: "Senior Frontend Developer",
+    period: "June 2020 – 2026",
+    location: "Paris",
+    summary:
+      "B2B SaaS products for real-estate professionals across France, Belgium, and Germany at one of Europe's leading real-estate tech companies.",
+    highlights: [
+      "Architected and delivered three B2B web apps from scratch to production, used by thousands of real-estate agents.",
+      "Designed a micro-frontend architecture improving deployment independence and platform scalability.",
+      "Set up frontend testing strategy (~80% coverage) and Datadog RUM monitoring across products.",
+    ],
+    stack: [
+      "React",
+      "TypeScript",
+      "React Query",
+      "Zustand",
+      "Design System",
+      "Vitest",
+      "Cypress",
+      "MSW",
+      "AWS",
+      "Terraform",
+      "CircleCI",
+      "Datadog",
+      "LaunchDarkly",
+    ],
+  },
+  {
+    company: "Interencheres",
+    role: "Lead Frontend Developer",
+    period: "Sept. 2016 – June 2020",
+    location: "Paris",
+    summary:
+      "Joined as Frontend Developer and grew into Lead, driving the frontend across the public marketplace and the back-office.",
+    highlights: [
+      "Led the merger of interencheres.com and interencheres-live.com using Vue.js 2 and Vuex.",
+      "Designed and built the back-office app with AngularJS and Angular Material.",
+      "Frontend reference for quality, consistency, and UX; helped adopt agile tooling (Asana etc.).",
+    ],
+    stack: ["JavaScript", "Vue.js 2", "Vuex", "AngularJS", "Angular Material"],
+  },
+]
+---
+
+<section
+  id="experience"
+  class="flex w-full scroll-mt-[160px] flex-col content-center justify-between lg:flex-row"
+>
+  <div class="top-[160px] mb-8 flex items-center self-start lg:sticky lg:mb-0">
+    <HugeiconsIcon
+      icon={Briefcase02Icon}
+      className="hidden size-24 animate-glow-wander sm:block"
+    />
+    <div
+      class="ml-8 hidden h-16 w-1 rotate-15 rounded-full bg-foreground sm:block"
+    >
+    </div>
+    <hgroup class="sm:ml-8">
+      <h2 class="text-3xl font-bold sm:text-5xl">Experience</h2>
+      <h3 class="text-special">A decade of frontend craft</h3>
+    </hgroup>
+  </div>
+
+  <div class="flex flex-col gap-4 lg:w-[480px]">
+    {
+      experiences.map((xp) => (
+        <SpotlightCard client:visible spotlightColor="rgba(192, 132, 252, 0.3)">
+          <Card>
+            <CardHeader>
+              <div class="flex items-center gap-2 text-muted-foreground">
+                <HugeiconsIcon icon={Building03Icon} className="size-4" />
+                <span class="text-xs tracking-wide uppercase">
+                  {xp.company}
+                </span>
+              </div>
+              <CardTitle>{xp.role}</CardTitle>
+              <CardDescription className="flex flex-wrap gap-x-3 gap-y-1">
+                <span class="inline-flex items-center gap-1">
+                  <HugeiconsIcon icon={Calendar03Icon} className="size-3.5" />
+                  {xp.period}
+                </span>
+                <span class="inline-flex items-center gap-1">
+                  <HugeiconsIcon icon={Location01Icon} className="size-3.5" />
+                  {xp.location}
+                </span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <p class="text-sm text-muted-foreground">{xp.summary}</p>
+              <ul class="list-disc space-y-1 pl-5 text-sm">
+                {xp.highlights.map((h) => (
+                  <li>{h}</li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter className="flex flex-wrap gap-1.5">
+              {xp.stack.map((tech) => (
+                <Badge variant="outline">{tech}</Badge>
+              ))}
+            </CardFooter>
+          </Card>
+        </SpotlightCard>
+      ))
+    }
+  </div>
+</section>
