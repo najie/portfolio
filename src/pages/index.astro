@@ -2,6 +2,7 @@
 import Layout from "@/layouts/main.astro"
 import { ProjectsSection, IndexHero, ContactSection } from "@/components"
 // import { SkillsSection } from "@/components/skills-section"
+import HeadlineSection from "@/components/headline-section.astro"
 ---
 
 <Layout>
@@ -11,6 +12,7 @@ import { ProjectsSection, IndexHero, ContactSection } from "@/components"
 
       <div class="mt-32 flex flex-col gap-32">
         <!-- <SkillsSection client:load /> -->
+        <HeadlineSection />
         <ProjectsSection client:load />
         <ContactSection client:load />
       </div>
