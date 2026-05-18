@@ -9,12 +9,7 @@ const PomodoroApp = () => {
   const pomodoro = usePomodoro()
 
   return (
-    <div
-      className="flex h-full w-full flex-col items-center justify-center"
-      onMouseMove={pomodoro.handleMouseMove}
-      onMouseUp={pomodoro.handleMouseUp}
-      onMouseLeave={pomodoro.handleMouseUp}
-    >
+    <div className="flex h-full w-full flex-col items-center justify-center">
       <PomodoroDisplay
         displayLabel={pomodoro.displayLabel}
         isRunning={pomodoro.isRunning}
@@ -22,8 +17,12 @@ const PomodoroApp = () => {
       />
 
       <div
-        className="relative"
+        ref={pomodoro.dragSurfaceRef}
+        className="relative touch-none"
         style={{ width: CONTAINER_WIDTH, height: CONTAINER_HEIGHT }}
+        onPointerMove={pomodoro.handlePointerMove}
+        onPointerUp={pomodoro.handlePointerUp}
+        onPointerCancel={pomodoro.handlePointerUp}
       >
         <PomodoroNotchArcs />
         <PomodoroLever
@@ -31,7 +30,7 @@ const PomodoroApp = () => {
           isIdle={pomodoro.isIdle}
           distance={pomodoro.distance}
           tension={pomodoro.tension}
-          onMouseDown={pomodoro.handleMouseDown}
+          onPointerDown={pomodoro.handlePointerDown}
         />
       </div>
     </div>

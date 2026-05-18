@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from "react"
-import { computeLeverPosition, getDisplayLabel } from "./utils"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { computeLeverPosition, getDisplayLabel, tickCountdown } from "./utils"
 
 const usePomodoro = () => {
   const [isDragging, setIsDragging] = useState(false)
@@ -11,12 +11,16 @@ const usePomodoro = () => {
   const [tension, setTension] = useState(0)
 
   const dragRef = useRef<{
-    startMouse: { x: number; y: number }
+    startPointer: { x: number; y: number }
     startDistance: { x: number; y: number }
   } | null>(null)
-  const secondsIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const secondsIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  )
   const pausedRef = useRef<{ minutes: number; seconds: number } | null>(null)
   const pastFirstNotchRef = useRef(false)
+  const dragSurfaceRef = useRef<HTMLDivElement>(null)
+  const countdownRef = useRef({ minutes: 0, seconds: 0 })
 
   const isIdle = !isDragging && !isRunning
   const displayLabel = getDisplayLabel({
@@ -27,37 +31,50 @@ const usePomodoro = () => {
     draftMinutes,
   })
 
-  const clearCountdownInterval = () => {
-    if (secondsIntervalRef.current) {
+  const clearCountdownInterval = useCallback(() => {
+    if (secondsIntervalRef.current !== undefined) {
       clearInterval(secondsIntervalRef.current)
       secondsIntervalRef.current = undefined
     }
-  }
+  }, [])
+
+  const finishCountdown = useCallback(() => {
+    clearCountdownInterval()
+    countdownRef.current = { minutes: 0, seconds: 0 }
+    setTimer(0)
+    setSeconds(0)
+    setIsRunning(false)
+  }, [clearCountdownInterval])
 
   const runCountdownInterval = useCallback(() => {
     clearCountdownInterval()
     secondsIntervalRef.current = setInterval(() => {
-      setSeconds((s) => {
-        if (s <= 0) {
-          setTimer((t) => t - 1)
-          return 59
-        }
-        return s - 1
-      })
+      const { minutes, seconds: secs } = countdownRef.current
+      const next = tickCountdown(minutes, secs)
+      if (next.completed) {
+        finishCountdown()
+        return
+      }
+      countdownRef.current = { minutes: next.minutes, seconds: next.seconds }
+      setTimer(next.minutes)
+      setSeconds(next.seconds)
     }, 1000)
-  }, [])
+  }, [clearCountdownInterval, finishCountdown])
 
-  const resetTimer = () => {
+  useEffect(() => () => clearCountdownInterval(), [clearCountdownInterval])
+
+  const resetTimer = useCallback(() => {
     clearCountdownInterval()
     pausedRef.current = null
     pastFirstNotchRef.current = false
+    countdownRef.current = { minutes: 0, seconds: 0 }
     setTimer(0)
     setSeconds(0)
     setDraftMinutes(null)
     setIsRunning(false)
     setDistance({ x: 0, y: 0 })
     setTension(0)
-  }
+  }, [clearCountdownInterval])
 
   const startTimer = useCallback(
     (initialMinutes: number) => {
@@ -67,12 +84,13 @@ const usePomodoro = () => {
       setDistance({ x: 0, y: 0 })
       setTension(0)
       setDraftMinutes(null)
+      countdownRef.current = { minutes: initialMinutes, seconds: 0 }
       setTimer(initialMinutes)
       setSeconds(0)
       setIsRunning(true)
       runCountdownInterval()
     },
-    [runCountdownInterval]
+    [clearCountdownInterval, runCountdownInterval]
   )
 
   const resumeTimer = useCallback(
@@ -81,16 +99,19 @@ const usePomodoro = () => {
       pausedRef.current = null
       pastFirstNotchRef.current = false
       setDraftMinutes(null)
+      countdownRef.current = { minutes, seconds }
       setTimer(minutes)
       setSeconds(seconds)
       setIsRunning(true)
       runCountdownInterval()
     },
-    [runCountdownInterval]
+    [clearCountdownInterval, runCountdownInterval]
   )
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault()
+    dragSurfaceRef.current?.setPointerCapture(event.pointerId)
+
     if (isRunning) {
       clearCountdownInterval()
       pausedRef.current = { minutes: timer, seconds }
@@ -99,12 +120,16 @@ const usePomodoro = () => {
     setDraftMinutes(null)
     setIsDragging(true)
     dragRef.current = {
-      startMouse: { x: event.clientX, y: event.clientY },
+      startPointer: { x: event.clientX, y: event.clientY },
       startDistance: { ...distance },
     }
   }
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const surface = dragSurfaceRef.current
+    if (surface?.hasPointerCapture(event.pointerId)) {
+      surface.releasePointerCapture(event.pointerId)
+    }
     if (!dragRef.current) return
 
     const paused = pausedRef.current
@@ -132,11 +157,11 @@ const usePomodoro = () => {
     }
   }
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!dragRef.current) return
 
-    const rawDx = event.clientX - dragRef.current.startMouse.x
-    const rawDy = event.clientY - dragRef.current.startMouse.y
+    const rawDx = event.clientX - dragRef.current.startPointer.x
+    const rawDy = event.clientY - dragRef.current.startPointer.y
 
     const {
       finalX,
@@ -155,6 +180,7 @@ const usePomodoro = () => {
     } else {
       setDraftMinutes(null)
       if (leverY <= 0 && !isRunning && !pausedRef.current) {
+        countdownRef.current = { minutes: 0, seconds: 0 }
         setTimer(0)
       }
     }
@@ -173,9 +199,10 @@ const usePomodoro = () => {
     tension,
     displayLabel,
     resetTimer,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseMove,
+    dragSurfaceRef,
+    handlePointerDown,
+    handlePointerUp,
+    handlePointerMove,
   }
 }
 

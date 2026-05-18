@@ -189,6 +189,23 @@ type DisplayLabelParams = {
   draftMinutes: number | null
 }
 
+type CountdownTick = {
+  minutes: number
+  seconds: number
+  completed: boolean
+}
+
+/** Single countdown step — returns `completed: true` at 0:00. */
+const tickCountdown = (minutes: number, seconds: number): CountdownTick => {
+  if (seconds > 0) {
+    return { minutes, seconds: seconds - 1, completed: false }
+  }
+  if (minutes > 0) {
+    return { minutes: minutes - 1, seconds: 59, completed: false }
+  }
+  return { minutes: 0, seconds: 0, completed: true }
+}
+
 const getDisplayLabel = ({
   isRunning,
   isDragging,
@@ -224,5 +241,6 @@ export {
   getOrbitPadding,
   getOrbitSize,
   isPastFirstNotch,
+  tickCountdown,
 }
-export type { DisplayLabelParams, LeverPositionResult, Point }
+export type { CountdownTick, DisplayLabelParams, LeverPositionResult, Point }

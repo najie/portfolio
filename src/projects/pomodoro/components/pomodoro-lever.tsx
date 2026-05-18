@@ -11,7 +11,7 @@ type PomodoroLeverProps = {
   isIdle: boolean
   distance: { x: number; y: number }
   tension: number
-  onMouseDown: (event: React.MouseEvent<HTMLDivElement>) => void
+  onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void
 }
 
 const PomodoroLever = ({
@@ -19,7 +19,7 @@ const PomodoroLever = ({
   isIdle,
   distance,
   tension,
-  onMouseDown,
+  onPointerDown,
 }: PomodoroLeverProps) => (
   <>
     {isDragging && (
@@ -62,7 +62,7 @@ const PomodoroLever = ({
         top: PIVOT_Y,
         transform: `translate(calc(-50% + ${distance.x}px), calc(-50% + ${distance.y}px))`,
       }}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
     />
   </>
 )

@@ -22,7 +22,10 @@ const PomodoroDisplay = ({
     </div>
     <div>
       <Button
+        type="button"
         onClick={onStop}
+        tabIndex={isRunning ? 0 : -1}
+        aria-hidden={!isRunning}
         className="cursor-pointer"
         style={
           isRunning
@@ -30,10 +33,12 @@ const PomodoroDisplay = ({
                 opacity: 1,
                 transform: "translateY(0)",
                 transition: "all 0.3s ease",
+                pointerEvents: "auto",
               }
             : {
                 opacity: 0,
                 transform: "translateY(-10px)",
+                pointerEvents: "none",
               }
         }
       >
