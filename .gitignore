@@ -24,3 +24,10 @@ pnpm-debug.log*
 
 # screenshots
 scripts/screenshots/
+
+# impeccable review captures
+.impeccable/review/
+.impeccable/questions/
+.impeccable/hook.cache.json
+.impeccable/surface-round.json
+.impeccable/mocks/decision/*.png

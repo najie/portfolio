@@ -28,23 +28,13 @@ const TypewriterHeading = () => {
   const [visibleChars, setVisibleChars] = useState(0)
   const [isTyping, setIsTyping] = useState(false)
   const [showCursor, setShowCursor] = useState(true)
-  const [runToken, setRunToken] = useState(0)
+  const [runToken] = useState(0)
 
   const totalChars = useMemo(
     () =>
       segments.reduce((sum, segment) => sum + (segment.text?.length ?? 0), 0),
     []
   )
-
-  useEffect(() => {
-    const restartTypewriter = () => setRunToken((token) => token + 1)
-
-    window.addEventListener("theme-change", restartTypewriter)
-
-    return () => {
-      window.removeEventListener("theme-change", restartTypewriter)
-    }
-  }, [])
 
   useEffect(() => {
     let isCancelled = false

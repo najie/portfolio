@@ -1,0 +1,44 @@
+---
+interface Props {
+  quiet?: boolean
+}
+const { quiet = false } = Astro.props
+---
+
+<div aria-hidden="true" class:list={["wallpaper", { quiet }]}>
+  <span
+    class="pool bg-[#ff92c8] opacity-45"
+    style="width:520px;height:520px;left:50%;top:-140px;margin-left:-364px"
+  ></span>
+  <span
+    class="pool bg-[#2bbdf5] opacity-30"
+    style="width:420px;height:420px;left:50%;top:40px;margin-left:42px"></span>
+  <span
+    class="pool bg-[#c9b8ff] opacity-35"
+    style="width:600px;height:600px;left:50%;top:60vh;margin-left:-300px"
+  ></span>
+</div>
+
+<script>
+  // The drift itself is CSS; this only shapes its speed: surge on load, then settle into the slow loop.
+  const PEAK_RATE = 8
+  const RISE_MS = 1200
+  const SETTLE_MS = 12000
+
+  const drifts =
+    document.querySelector(".wallpaper")?.getAnimations({ subtree: true }) ?? []
+  const start = performance.now()
+
+  function tick(now: number) {
+    const t = now - start
+    const done = t >= RISE_MS + SETTLE_MS
+    const surge =
+      t < RISE_MS ? (t / RISE_MS) ** 2 : (1 - (t - RISE_MS) / SETTLE_MS) ** 2
+    const rate = done ? 1 : 1 + (PEAK_RATE - 1) * surge
+    for (const drift of drifts) drift.playbackRate = rate
+    if (!done) requestAnimationFrame(tick)
+  }
+
+  // Empty under prefers-reduced-motion, where the CSS drift is off.
+  if (drifts.length) requestAnimationFrame(tick)
+</script>

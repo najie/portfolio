@@ -1,0 +1,95 @@
+/* Registered so the knob and cable, both derived from these, swing as one object. */
+@property --lever-x {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --lever-y {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+@property --lever-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 30px;
+}
+@property --cable-width {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 3px;
+}
+
+.pomodoro-dial {
+  /* Damped pendulum: a released lever overshoots once, then settles. */
+  --swing: linear(
+    0,
+    0.327,
+    0.607,
+    0.817,
+    0.955,
+    1.034,
+    1.068,
+    1.075,
+    1.065,
+    1.05,
+    1.033,
+    1.019,
+    1.009,
+    1.002,
+    0.998,
+    0.997,
+    0.996,
+    0.997,
+    0.998,
+    0.998,
+    0.999,
+    1
+  );
+  transition:
+    --lever-x 0.8s var(--swing),
+    --lever-y 0.8s var(--swing),
+    --lever-size 0.8s var(--swing),
+    --cable-width 0.8s var(--swing);
+}
+.pomodoro-dial[data-dragging="true"] {
+  transition: none;
+}
+
+.pomodoro-cable {
+  width: hypot(var(--lever-x), var(--lever-y));
+  height: var(--cable-width);
+  transform: translateY(-50%) rotate(atan2(var(--lever-y), var(--lever-x)));
+  transform-origin: 0 50%;
+}
+
+.pomodoro-knob {
+  width: var(--lever-size);
+  height: var(--lever-size);
+  transform: translate(
+    calc(-50% + var(--lever-x)),
+    calc(-50% + var(--lever-y))
+  );
+}
+/* Keeps a 44px grab target when the knob shrinks under tension. */
+.pomodoro-knob::before {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+/* A one-off bell ring from the knob; idle keeps the slow ping. */
+.pomodoro-ring[data-finished="true"] {
+  animation-duration: 1.2s !important;
+  animation-iteration-count: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pomodoro-dial {
+    transition: none;
+  }
+}

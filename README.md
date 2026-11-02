@@ -14,7 +14,7 @@ You're welcome to explore the code and use it as a reference for your own projec
 
 ## Sections
 
-- **Hero** — Animated introduction with custom cursor, typewriter effects, and a galaxy background
+- **Hero** — Lock-screen style greeting on a liquid-glass widget stack, custom cursor, "Oui" wordmark
 - **Projects** — Hand-crafted frontend experiments and side projects built for fun
 - **About** — A section to get to know me better
 - **Contact** — Reach out for collaborations or just to say hi

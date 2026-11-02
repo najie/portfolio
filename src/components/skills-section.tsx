@@ -5,10 +5,7 @@ const SkillsSection = () => {
   return (
     <section className="mt-16 flex w-full flex-col">
       <div className="flex items-center">
-        <HugeiconsIcon
-          icon={FallingStarIcon}
-          className="size-24 animate-glow-wander"
-        />
+        <HugeiconsIcon icon={FallingStarIcon} className="size-24" />
 
         <hgroup className="ml-8 border-l border-mist-600 pl-8">
           <h2 className="text-5xl font-bold">Skills</h2>

@@ -1,5 +1,4 @@
 export * from "./react-bits"
-export * from "./theme-toggle.tsx"
 export * from "./typewriter-heading"
 export * from "./main-layout-header"
 export * from "./project-layout-header.astro"

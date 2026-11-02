@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Oui — Lock Screen Stack</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .col {
+    width: min(600px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 140px;
+  }
+  .top {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 0;
+  }
+  .lock {
+    text-align: center;
+    padding: 72px 0 56px;
+  }
+  .lock .date {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .lock h1 {
+    font-size: clamp(64px, 12vw, 128px);
+    margin-top: 10px;
+  }
+  .lock .sub {
+    margin-top: 14px;
+    font-size: 18px;
+  }
+  .slider {
+    margin: 36px auto 0;
+    width: 320px;
+    max-width: 100%;
+    height: 64px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .slider .knob {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.35);
+    flex: none;
+  }
+  .slider span {
+    font-family: var(--display);
+    font-size: 20px;
+    letter-spacing: 0.08em;
+  }
+  .headline {
+    text-align: center;
+    padding: 0 0 36px;
+  }
+  .headline h2 {
+    font-size: 30px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .w {
+    padding: 20px 22px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .w.wide {
+    grid-column: 1 / -1;
+  }
+  .w .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .w h3 {
+    font-family: var(--display);
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+  .w ul.points {
+    font-size: 14px;
+    line-height: 1.45;
+    display: grid;
+    gap: 6px;
+  }
+  .w ul.points li::before {
+    content: "— ";
+    color: var(--muted);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin: 28px 4px 10px;
+  }
+  .proj {
+    aspect-ratio: 1;
+    min-height: 0;
+    justify-content: space-between;
+  }
+  .proj .sym {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+  .projects {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .contact {
+    gap: 12px;
+  }
+  .contact .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.5);
+  }
+  .contact .row strong {
+    display: block;
+    font-size: 14px;
+  }
+  .contact .row span {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .tabbar {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    z-index: 10;
+  }
+  .tabbar a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: var(--r-pill);
+    font-family: var(--display);
+    font-size: 18px;
+    letter-spacing: 0.06em;
+  }
+  .tabbar a.on {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.25);
+  }
+  @media (max-width: 640px) {
+    .projects {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .w.wide-sm {
+      grid-column: 1 / -1;
+    }
+    .tabbar a span {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wallpaper">
+  <div class="pool pink" style="width:520px;height:520px;left:50%;top:-140px;transform:translateX(-70%)"></div>
+  <div class="pool sky" style="width:420px;height:420px;left:50%;top:40px;transform:translateX(10%);opacity:.4"></div>
+  <div class="pool violet" style="width:600px;height:600px;left:50%;top:60vh;transform:translateX(-50%);opacity:.5"></div>
+</div>
+
+<main class="col">
+  <div class="top">
+    <svg class="logo" viewBox="0 0 60 100" fill="none" stroke="currentColor" stroke-width="7" role="img" aria-label="Oui"><rect x="3.5" y="3.5" width="15" height="93" rx="7"/><path d="M30.5 24v65.5a7 7 0 0 0 14 0V24"/><path d="M56.5 24v76"/></svg>
+  </div>
+
+  <section class="lock">
+    <p class="date">Senior Frontend Developer · Paris · Freelance</p>
+    <h1 class="display">Hi.<br />I'm Jeremy Laurain.</h1>
+    <p class="sub">A decade of React, TypeScript and interfaces that feel finished.</p>
+    <a href="#projects" class="lg pill tap slider">
+      <span class="knob"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <span>Explore what I can do</span>
+    </a>
+  </section>
+
+  <section class="headline">
+    <h2 class="display">"Oui" is the answer to <span class="accent">"can we build this?"</span></h2>
+    <p class="muted" style="margin-top:8px">Let's create great things together.</p>
+  </section>
+
+  <p class="section-title" id="experience">EXPERIENCE</p>
+  <div class="grid">
+    <article class="lg w wide">
+      <div class="head"><h3>Senior Frontend Developer</h3><span class="chip">2026 – Present</span></div>
+      <p class="meta">Oui · Paris · Freelance frontend developer for various clients.</p>
+      <ul class="points"><li>Build various projects for clients with care and attention to detail.</li><li>More infos soon…</li></ul>
+      <div class="chips"><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Astro</span><span class="chip">Tailwind CSS</span><span class="chip">Agentic</span></div>
+    </article>
+    <article class="lg w wide">
+      <div class="head"><h3>Senior Frontend Developer</h3><span class="chip">2020 – 2026</span></div>
+      <p class="meta">AVIV Group · Paris · B2B SaaS for real-estate professionals across France, Belgium and Germany.</p>
+      <ul class="points"><li>Architected and delivered three B2B web apps from scratch to production, used by thousands of agents.</li><li>Designed a micro-frontend architecture improving deployment independence.</li><li>Set up the testing strategy (~80% coverage) and Datadog RUM monitoring.</li></ul>
+      <div class="chips"><span class="chip">React</span><span class="chip">React Query</span><span class="chip">Zustand</span><span class="chip">Vitest</span><span class="chip">Cypress</span><span class="chip">AWS</span><span class="chip">Terraform</span></div>
+    </article>
+    <article class="lg w wide">
+      <div class="head"><h3>Lead Frontend Developer</h3><span class="chip">2016 – 2020</span></div>
+      <p class="meta">Interencheres · Paris · From Frontend Developer to Lead across the marketplace and the back-office.</p>
+      <ul class="points"><li>Led the merger of interencheres.com and interencheres-live.com with Vue.js 2 and Vuex.</li><li>Designed and built the back-office with AngularJS and Angular Material.</li></ul>
+      <div class="chips"><span class="chip">Vue.js 2</span><span class="chip">Vuex</span><span class="chip">AngularJS</span></div>
+    </article>
+  </div>
+
+  <p class="section-title" id="projects">PROJECTS</p>
+  <div class="grid projects">
+    <a href="#" class="lg w proj tap">
+      <span class="sym"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></span>
+      <div><h3>Pomodoro Timer</h3><p class="meta">A drag-to-set timer</p></div>
+    </a>
+    <div class="lg w proj">
+      <span class="sym"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="15" cy="9" r="1"/></svg></span>
+      <div><span class="badge">Coming soon</span><h3 style="margin-top:6px">Cookie Clicker</h3></div>
+    </div>
+    <div class="lg w proj">
+      <span class="sym"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/></svg></span>
+      <div><span class="badge">Coming soon</span><h3 style="margin-top:6px">Zod Form</h3></div>
+    </div>
+  </div>
+
+  <p class="section-title" id="contact">CONTACT</p>
+  <div class="grid">
+    <article class="lg w wide contact">
+      <div class="head"><h3>Let's get in touch</h3></div>
+      <a class="row tap" href="#"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg><div><strong>Email</strong><span>jeremylaurain+free@gmail.com · tap to copy</span></div></a>
+      <a class="row tap" href="#"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 11v6M8 7v.5M12 17v-4a2 2 0 1 1 4 0v4"/></svg><div><strong>LinkedIn</strong><span>Let's connect</span></div></a>
+      <a class="row tap" href="#"><svg class="icon" viewBox="0 0 24 24"><path d="M9 19c-4 1.5-5-1.5-7-2m14 4v-3.5a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.8 11.8 0 0 0-6.2 0C7.3 2.5 6.3 2.8 6.3 2.8a4.3 4.3 0 0 0-.1 3.2A4.6 4.6 0 0 0 4.9 9.2c0 4.6 2.8 5.7 5.5 6a3 3 0 0 0-.8 2.3V21"/></svg><div><strong>GitHub</strong><span>Check out my code</span></div></a>
+    </article>
+  </div>
+</main>
+
+<nav class="lg pill tabbar">
+  <a href="#experience" class="on"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Experience</span></a>
+  <a href="#projects"><svg class="icon" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12 4 7.5M12 12l8-4.5M12 12v9"/></svg><span>Projects</span></a>
+  <a href="#contact"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg><span>Contact</span></a>
+</nav>
+</body>
+</html>

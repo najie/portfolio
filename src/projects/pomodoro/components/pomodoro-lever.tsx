@@ -1,70 +1,50 @@
-import {
-  CABLE_WIDTH_MAX,
-  CABLE_WIDTH_MIN,
-  LEVER_SIZE_MAX,
-  LEVER_SIZE_MIN,
-} from "../constant"
 import { PIVOT_X, PIVOT_Y } from "../utils"
 
+type PointerHandler = (event: React.PointerEvent<HTMLDivElement>) => void
+
 type PomodoroLeverProps = {
-  isDragging: boolean
   isIdle: boolean
-  distance: { x: number; y: number }
-  tension: number
-  onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void
+  isFinished: boolean
+  onPointerDown: PointerHandler
+  onPointerMove: PointerHandler
+  onPointerUp: PointerHandler
+  onLostPointerCapture: PointerHandler
 }
 
 const PomodoroLever = ({
-  isDragging,
   isIdle,
-  distance,
-  tension,
+  isFinished,
   onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onLostPointerCapture,
 }: PomodoroLeverProps) => (
-  <>
-    {isDragging && (
-      <div
-        className="pointer-events-none absolute bg-mist-600 transition-[height] duration-50"
-        style={{
-          width: Math.sqrt(distance.x ** 2 + distance.y ** 2),
-          height:
-            CABLE_WIDTH_MAX - tension * (CABLE_WIDTH_MAX - CABLE_WIDTH_MIN),
-          left: PIVOT_X,
-          top: PIVOT_Y,
-          transform: `rotate(${Math.atan2(distance.y, distance.x) * (180 / Math.PI)}deg)`,
-          transformOrigin: "0 50%",
-        }}
-      />
-    )}
-    {isIdle && (
-      <div
-        className="pointer-events-none absolute"
-        style={{
-          width: LEVER_SIZE_MAX,
-          height: LEVER_SIZE_MAX,
-          left: PIVOT_X,
-          top: PIVOT_Y,
-          transform: `translate(calc(-50% + ${distance.x}px), calc(-50% + ${distance.y}px))`,
-        }}
-      >
+  <div aria-hidden>
+    <span
+      className="absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground"
+      style={{ left: PIVOT_X, top: PIVOT_Y }}
+    />
+    <div
+      className="pomodoro-cable pointer-events-none absolute bg-foreground"
+      style={{ left: PIVOT_X, top: PIVOT_Y }}
+    />
+    <div
+      className="pomodoro-knob absolute z-10 cursor-grab rounded-full bg-white shadow-[inset_0_0_0_1.5px_var(--foreground),0_8px_16px_-6px_oklch(0.2_0.02_300/0.45)] active:cursor-grabbing"
+      style={{ left: PIVOT_X, top: PIVOT_Y }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onLostPointerCapture={onLostPointerCapture}
+    >
+      {isIdle && (
         <span
-          className="absolute inset-0 rounded-full border-2 border-mist-600 opacity-75 motion-safe:animate-ping motion-reduce:animate-none"
+          data-finished={isFinished}
+          className="pomodoro-ring pointer-events-none absolute inset-0 rounded-full border-2 border-foreground opacity-50 motion-safe:animate-ping motion-reduce:hidden"
           style={{ animationDuration: "3s" }}
         />
-      </div>
-    )}
-    <div
-      className="absolute cursor-grab rounded-full border-2 border-mist-600 bg-white shadow-sm shadow-mist-600 transition-[width,height] duration-50 active:cursor-grabbing"
-      style={{
-        width: LEVER_SIZE_MAX - tension * (LEVER_SIZE_MAX - LEVER_SIZE_MIN),
-        height: LEVER_SIZE_MAX - tension * (LEVER_SIZE_MAX - LEVER_SIZE_MIN),
-        left: PIVOT_X,
-        top: PIVOT_Y,
-        transform: `translate(calc(-50% + ${distance.x}px), calc(-50% + ${distance.y}px))`,
-      }}
-      onPointerDown={onPointerDown}
-    />
-  </>
+      )}
+    </div>
+  </div>
 )
 
 export { PomodoroLever }

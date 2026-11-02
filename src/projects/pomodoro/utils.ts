@@ -75,20 +75,27 @@ const getClosestPointOnNotchArc = (
   return { point, distance }
 }
 
+/**
+ * Radius of the notch arc passing through the lever, so the reading matches the
+ * drawn arcs anywhere on the dial. Beyond the arc ends (|x| > y) only depth counts.
+ */
+const getArcRadius = ({ x, y }: Point) => {
+  if (y <= 0) return 0
+  return y >= Math.abs(x) ? (x * x + y * y) / y : 2 * y
+}
+
 const isPastFirstNotch = (
   leverY: number,
-  effectiveDist: number,
+  arcRadius: number,
   snappedNotchIndex: number | undefined
-) =>
-  leverY > 0 &&
-  (snappedNotchIndex !== undefined || effectiveDist >= MIN_RADIUS)
+) => leverY > 0 && (snappedNotchIndex !== undefined || arcRadius >= MIN_RADIUS)
 
 const computeDraftMinutes = (
   leverY: number,
-  effectiveDist: number,
+  arcRadius: number,
   snappedNotchIndex: number | undefined
 ): number | null => {
-  if (!isPastFirstNotch(leverY, effectiveDist, snappedNotchIndex)) {
+  if (!isPastFirstNotch(leverY, arcRadius, snappedNotchIndex)) {
     return null
   }
   if (snappedNotchIndex !== undefined) {
@@ -96,7 +103,7 @@ const computeDraftMinutes = (
   }
   const t = Math.min(
     1,
-    Math.max(0, (effectiveDist - MIN_RADIUS) / (MAX_ORBIT_RADIUS - MIN_RADIUS))
+    Math.max(0, (arcRadius - MIN_RADIUS) / (MAX_ORBIT_RADIUS - MIN_RADIUS))
   )
   return Math.round(
     TIMERS_NOTCHES[0] +
@@ -110,6 +117,20 @@ const applyRubber = (raw: number, strength: number, max: number) => {
   const reach = max * (1 + strength)
   const t = Math.min(1, absRaw / reach)
   return Math.sign(raw) * max * (1 - Math.pow(1 - t, 1 + strength))
+}
+
+/** Raw pointer travel that `applyRubber` maps to `value`, for `value` in [0, max]. */
+const invertRubber = (value: number, strength: number, max: number) =>
+  max * (1 + strength) * (1 - Math.pow(1 - value / max, 1 / (1 + strength)))
+
+/** Lever depth for a remaining time: the same scale the notch arcs are drawn on. */
+const getRestRadius = (remainingSeconds: number) => {
+  const minutes = remainingSeconds / 60
+  const first = TIMERS_NOTCHES[0]
+  const last = TIMERS_NOTCHES[TIMERS_NOTCHES.length - 1]
+  if (minutes <= first) return (minutes / first) * MIN_RADIUS
+  const t = Math.min(1, (minutes - first) / (last - first))
+  return MIN_RADIUS + t * (MAX_ORBIT_RADIUS - MIN_RADIUS)
 }
 
 type LeverPositionResult = {
@@ -160,14 +181,10 @@ const computeLeverPosition = (
     })
   }
 
-  const effectiveDist = Math.sqrt(finalX ** 2 + finalY ** 2)
-  const pastFirstNotch = isPastFirstNotch(
-    leverY,
-    effectiveDist,
-    snappedNotchIndex
-  )
+  const arcRadius = getArcRadius({ x: finalX, y: finalY })
+  const pastFirstNotch = isPastFirstNotch(leverY, arcRadius, snappedNotchIndex)
   const draftMinutes = pastFirstNotch
-    ? computeDraftMinutes(leverY, effectiveDist, snappedNotchIndex)
+    ? computeDraftMinutes(leverY, arcRadius, snappedNotchIndex)
     : null
 
   return {
@@ -183,45 +200,27 @@ const computeLeverPosition = (
 
 type DisplayLabelParams = {
   isRunning: boolean
-  isDragging: boolean
-  timer: number
-  seconds: number
+  isFinished: boolean
+  remainingSeconds: number
   draftMinutes: number | null
 }
 
-type CountdownTick = {
-  minutes: number
-  seconds: number
-  completed: boolean
-}
+/** Whole seconds left, rounded up so a timer shows 5:00 for its first second. */
+const getRemainingSeconds = (deadline: number, now: number) =>
+  Math.max(0, Math.ceil((deadline - now) / 1000))
 
-/** Single countdown step — returns `completed: true` at 0:00. */
-const tickCountdown = (minutes: number, seconds: number): CountdownTick => {
-  if (seconds > 0) {
-    return { minutes, seconds: seconds - 1, completed: false }
-  }
-  if (minutes > 0) {
-    return { minutes: minutes - 1, seconds: 59, completed: false }
-  }
-  return { minutes: 0, seconds: 0, completed: true }
-}
+const formatClock = (totalSeconds: number) =>
+  `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`
 
 const getDisplayLabel = ({
   isRunning,
-  isDragging,
-  timer,
-  seconds,
+  isFinished,
+  remainingSeconds,
   draftMinutes,
 }: DisplayLabelParams) => {
-  if (isRunning && !isDragging) {
-    return `${timer} : ${String(seconds).padStart(2, "0")}`
-  }
-  if (isDragging) {
-    return draftMinutes !== null
-      ? `${draftMinutes} minutes`
-      : "Drag to set timer"
-  }
-  return timer > 0 ? `${timer} minutes` : "Drag to set timer"
+  if (draftMinutes !== null) return `${draftMinutes} minutes`
+  if (isRunning) return formatClock(remainingSeconds)
+  return isFinished ? "Time's up" : "Drag to set timer"
 }
 
 export {
@@ -235,12 +234,16 @@ export {
   applyRubber,
   computeDraftMinutes,
   computeLeverPosition,
+  formatClock,
+  getArcRadius,
   getClosestPointOnNotchArc,
   getDisplayLabel,
   getNotchArc,
   getOrbitPadding,
   getOrbitSize,
+  getRemainingSeconds,
+  getRestRadius,
+  invertRubber,
   isPastFirstNotch,
-  tickCountdown,
 }
-export type { CountdownTick, DisplayLabelParams, LeverPositionResult, Point }
+export type { DisplayLabelParams, LeverPositionResult, Point }

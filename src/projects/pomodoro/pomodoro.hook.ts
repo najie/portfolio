@@ -1,208 +1,221 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { computeLeverPosition, getDisplayLabel, tickCountdown } from "./utils"
+import {
+  computeLeverPosition,
+  formatClock,
+  getDisplayLabel,
+  getRemainingSeconds,
+  getRestRadius,
+  invertRubber,
+  MAX_ORBIT_RADIUS,
+} from "./utils"
+import { COMMIT_TRAVEL, RUBBER_STRENGTH_DOWN } from "./constant"
+import type { Point } from "./utils"
+
+type DragSession = {
+  pointerId: number
+  startPointer: Point
+  rawOrigin: Point
+  draftMinutes: number | null
+}
+
+/** Runs in a worker because browsers throttle timers in background tabs. */
+const createTicker = (onTick: () => void) => {
+  const url = URL.createObjectURL(
+    new Blob(["setInterval(() => postMessage(0), 250)"])
+  )
+  const worker = new Worker(url)
+  URL.revokeObjectURL(url)
+  worker.onmessage = onTick
+  return worker
+}
+
+const playChime = (audio: AudioContext) => {
+  ;[659.25, 880].forEach((frequency, i) => {
+    const at = audio.currentTime + i * 0.28
+    const oscillator = new OscillatorNode(audio, { frequency })
+    const gain = new GainNode(audio, { gain: 0 })
+    gain.gain.linearRampToValueAtTime(0.18, at + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.001, at + 1.4)
+    oscillator.connect(gain).connect(audio.destination)
+    oscillator.start(at)
+    oscillator.stop(at + 1.4)
+  })
+}
 
 const usePomodoro = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
-  const [timer, setTimer] = useState(0)
-  const [seconds, setSeconds] = useState(0)
+  const [isFinished, setIsFinished] = useState(false)
+  const [remainingSeconds, setRemainingSeconds] = useState(0)
   const [draftMinutes, setDraftMinutes] = useState<number | null>(null)
-  const [distance, setDistance] = useState({ x: 0, y: 0 })
-  const [tension, setTension] = useState(0)
+  const [dragPosition, setDragPosition] = useState<Point>({ x: 0, y: 0 })
+  const [announcement, setAnnouncement] = useState("")
 
-  const dragRef = useRef<{
-    startPointer: { x: number; y: number }
-    startDistance: { x: number; y: number }
-  } | null>(null)
-  const secondsIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(
-    undefined
+  const dragRef = useRef<DragSession | null>(null)
+  const deadlineRef = useRef(0)
+  const tickerRef = useRef<Worker | null>(null)
+  const audioRef = useRef<AudioContext | null>(null)
+  const baseTitleRef = useRef<string | null>(null)
+
+  const stopTicker = useCallback(() => {
+    tickerRef.current?.terminate()
+    tickerRef.current = null
+  }, [])
+
+  useEffect(() => stopTicker, [stopTicker])
+
+  const syncCountdown = useCallback(() => {
+    const left = getRemainingSeconds(deadlineRef.current, Date.now())
+    setRemainingSeconds(left)
+    if (left > 0) return
+    stopTicker()
+    setIsRunning(false)
+    setIsFinished(true)
+    setAnnouncement("Time's up")
+    if (audioRef.current) playChime(audioRef.current)
+  }, [stopTicker])
+
+  const runCountdown = useCallback(
+    (totalSeconds: number) => {
+      stopTicker()
+      deadlineRef.current = Date.now() + totalSeconds * 1000
+      setRemainingSeconds(totalSeconds)
+      setIsRunning(true)
+      setIsFinished(false)
+      tickerRef.current = createTicker(syncCountdown)
+    },
+    [stopTicker, syncCountdown]
   )
-  const pausedRef = useRef<{ minutes: number; seconds: number } | null>(null)
-  const pastFirstNotchRef = useRef(false)
-  const dragSurfaceRef = useRef<HTMLDivElement>(null)
-  const countdownRef = useRef({ minutes: 0, seconds: 0 })
 
-  const isIdle = !isDragging && !isRunning
+  const startTimer = useCallback(
+    (minutes: number) => {
+      runCountdown(minutes * 60)
+      setAnnouncement(`${minutes} minute timer started`)
+    },
+    [runCountdown]
+  )
+
+  // Audio may only be unlocked inside a user gesture, long before the chime plays.
+  const unlockAudio = () => {
+    audioRef.current ??= new AudioContext()
+    void audioRef.current.resume()
+  }
+
+  const selectNotch = (minutes: number) => {
+    unlockAudio()
+    startTimer(minutes)
+  }
+
+  const resetTimer = useCallback(() => {
+    stopTicker()
+    setRemainingSeconds(0)
+    setIsRunning(false)
+    setIsFinished(false)
+    setAnnouncement("Timer stopped")
+  }, [stopTicker])
+
+  useEffect(() => {
+    baseTitleRef.current ??= document.title
+    if (isRunning) document.title = `${formatClock(remainingSeconds)} | Oui`
+    else if (isFinished) document.title = "Time's up | Oui"
+    else document.title = baseTitleRef.current
+  }, [isRunning, isFinished, remainingSeconds])
+
+  // half-pixel steps: the lever crawls, so most ticks should not restyle it
+  const restRadius = Math.round(getRestRadius(remainingSeconds) * 2) / 2
+  const distance = isDragging ? dragPosition : { x: 0, y: restRadius }
+  const tension = Math.hypot(distance.x, distance.y) / MAX_ORBIT_RADIUS
+  const reachedMinutes = draftMinutes ?? remainingSeconds / 60
   const displayLabel = getDisplayLabel({
     isRunning,
-    isDragging,
-    timer,
-    seconds,
+    isFinished,
+    remainingSeconds,
     draftMinutes,
   })
 
-  const clearCountdownInterval = useCallback(() => {
-    if (secondsIntervalRef.current !== undefined) {
-      clearInterval(secondsIntervalRef.current)
-      secondsIntervalRef.current = undefined
-    }
-  }, [])
-
-  const finishCountdown = useCallback(() => {
-    clearCountdownInterval()
-    countdownRef.current = { minutes: 0, seconds: 0 }
-    setTimer(0)
-    setSeconds(0)
-    setIsRunning(false)
-  }, [clearCountdownInterval])
-
-  const runCountdownInterval = useCallback(() => {
-    clearCountdownInterval()
-    secondsIntervalRef.current = setInterval(() => {
-      const { minutes, seconds: secs } = countdownRef.current
-      const next = tickCountdown(minutes, secs)
-      if (next.completed) {
-        finishCountdown()
-        return
-      }
-      countdownRef.current = { minutes: next.minutes, seconds: next.seconds }
-      setTimer(next.minutes)
-      setSeconds(next.seconds)
-    }, 1000)
-  }, [clearCountdownInterval, finishCountdown])
-
-  useEffect(() => () => clearCountdownInterval(), [clearCountdownInterval])
-
-  const resetTimer = useCallback(() => {
-    clearCountdownInterval()
-    pausedRef.current = null
-    pastFirstNotchRef.current = false
-    countdownRef.current = { minutes: 0, seconds: 0 }
-    setTimer(0)
-    setSeconds(0)
+  const endDrag = (commit: boolean) => {
+    const drag = dragRef.current
+    if (!drag) return
+    dragRef.current = null
+    setIsDragging(false)
     setDraftMinutes(null)
-    setIsRunning(false)
-    setDistance({ x: 0, y: 0 })
-    setTension(0)
-  }, [clearCountdownInterval])
 
-  const startTimer = useCallback(
-    (initialMinutes: number) => {
-      clearCountdownInterval()
-      pausedRef.current = null
-      pastFirstNotchRef.current = false
-      setDistance({ x: 0, y: 0 })
-      setTension(0)
-      setDraftMinutes(null)
-      countdownRef.current = { minutes: initialMinutes, seconds: 0 }
-      setTimer(initialMinutes)
-      setSeconds(0)
-      setIsRunning(true)
-      runCountdownInterval()
-    },
-    [clearCountdownInterval, runCountdownInterval]
-  )
-
-  const resumeTimer = useCallback(
-    (minutes: number, seconds: number) => {
-      clearCountdownInterval()
-      pausedRef.current = null
-      pastFirstNotchRef.current = false
-      setDraftMinutes(null)
-      countdownRef.current = { minutes, seconds }
-      setTimer(minutes)
-      setSeconds(seconds)
-      setIsRunning(true)
-      runCountdownInterval()
-    },
-    [clearCountdownInterval, runCountdownInterval]
-  )
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    dragSurfaceRef.current?.setPointerCapture(event.pointerId)
-
-    if (isRunning) {
-      clearCountdownInterval()
-      pausedRef.current = { minutes: timer, seconds }
-    }
-    pastFirstNotchRef.current = false
-    setDraftMinutes(null)
-    setIsDragging(true)
-    dragRef.current = {
-      startPointer: { x: event.clientX, y: event.clientY },
-      startDistance: { ...distance },
-    }
+    if (commit && drag.draftMinutes !== null) startTimer(drag.draftMinutes)
+    else if (isRunning) runCountdown(remainingSeconds)
   }
 
-  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    const surface = dragSurfaceRef.current
-    if (surface?.hasPointerCapture(event.pointerId)) {
-      surface.releasePointerCapture(event.pointerId)
-    }
-    if (!dragRef.current) return
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || dragRef.current) return
+    event.preventDefault()
+    unlockAudio()
+    event.currentTarget.setPointerCapture(event.pointerId)
 
-    const paused = pausedRef.current
-    const committedDraft = pastFirstNotchRef.current ? draftMinutes : null
-
-    setIsDragging(false)
-    dragRef.current = null
-    setDistance({ x: 0, y: 0 })
-    setTension(0)
-    setDraftMinutes(null)
-    pastFirstNotchRef.current = false
-
-    if (paused) {
-      if (committedDraft !== null && committedDraft > 0) {
-        startTimer(committedDraft)
-      } else {
-        resumeTimer(paused.minutes, paused.seconds)
-      }
-      pausedRef.current = null
-      return
-    }
-
-    if (committedDraft !== null && committedDraft > 0) {
-      startTimer(committedDraft)
+    if (isRunning) stopTicker()
+    setIsFinished(false)
+    setDragPosition(distance)
+    setIsDragging(true)
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startPointer: { x: event.clientX, y: event.clientY },
+      rawOrigin: {
+        x: 0,
+        y: invertRubber(distance.y, RUBBER_STRENGTH_DOWN, MAX_ORBIT_RADIUS),
+      },
+      draftMinutes: null,
     }
   }
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return
+    const drag = dragRef.current
+    if (drag?.pointerId !== event.pointerId) return
 
-    const rawDx = event.clientX - dragRef.current.startPointer.x
-    const rawDy = event.clientY - dragRef.current.startPointer.y
-
+    const deltaX = event.clientX - drag.startPointer.x
+    const deltaY = event.clientY - drag.startPointer.y
     const {
       finalX,
       finalY,
-      leverY,
-      tension: nextTension,
-      draftMinutes: nextDraftMinutes,
-      pastFirstNotch,
-    } = computeLeverPosition(rawDx, rawDy)
+      draftMinutes: nextDraft,
+    } = computeLeverPosition(
+      drag.rawOrigin.x + deltaX,
+      drag.rawOrigin.y + deltaY
+    )
 
-    pastFirstNotchRef.current = pastFirstNotch
-    setTension(nextTension)
+    // once the lever has really moved, a return near its origin can still commit
+    const moved =
+      drag.draftMinutes !== null || Math.hypot(deltaX, deltaY) >= COMMIT_TRAVEL
+    drag.draftMinutes = moved ? nextDraft : null
+    setDraftMinutes(drag.draftMinutes)
+    setDragPosition({ x: finalX, y: finalY })
+  }
 
-    if (pastFirstNotch) {
-      setDraftMinutes(nextDraftMinutes)
-    } else {
-      setDraftMinutes(null)
-      if (leverY <= 0 && !isRunning && !pausedRef.current) {
-        countdownRef.current = { minutes: 0, seconds: 0 }
-        setTimer(0)
-      }
-    }
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current?.pointerId === event.pointerId) endDrag(true)
+  }
 
-    setDistance({ x: finalX, y: finalY })
+  // Interrupted gestures (pointercancel, stolen capture) never start a timer.
+  const handleLostPointerCapture = (
+    event: React.PointerEvent<HTMLDivElement>
+  ) => {
+    if (dragRef.current?.pointerId === event.pointerId) endDrag(false)
   }
 
   return {
     isDragging,
     isRunning,
-    isIdle,
-    timer,
-    seconds,
-    draftMinutes,
+    isFinished,
+    isIdle: !isDragging && !isRunning,
     distance,
     tension,
+    reachedMinutes,
     displayLabel,
+    showsClock: draftMinutes !== null || isRunning,
+    announcement,
     resetTimer,
-    dragSurfaceRef,
+    selectNotch,
     handlePointerDown,
     handlePointerUp,
     handlePointerMove,
+    handleLostPointerCapture,
   }
 }
 

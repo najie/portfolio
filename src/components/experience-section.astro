@@ -1,41 +1,44 @@
 ---
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Briefcase02Icon,
-  Building03Icon,
-  Location01Icon,
-  Calendar03Icon,
-} from "@hugeicons/core-free-icons"
 import {
   Card,
+  CardAction,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
   CardFooter,
 } from "@/components/ui/card"
-import { SpotlightCard } from "@/components/react-bits"
 import { Badge } from "@/components/ui/badge"
+import {
+  FinanceToTheMoonLogo,
+  SeLogerLogo,
+  VizziaLogo,
+} from "@/components/client-logos"
 
 const experiences = [
   {
-    company: "Studio JL",
-    role: "Senior Frontend Developer",
+    company: "Oui",
+    role: "Freelance Senior Developer",
     period: "2026 – Present",
     location: "Paris",
-    summary: "Freelance frontend developer for various clients.",
+    summary:
+      "Independent frontend work for product teams, from first screens to production.",
     highlights: [
-      "Build various projects for clients with care and attention to detail.",
-      "More infos soon...",
+      "Built the operator web app for Vizzia's video enforcement platform: rule creation, detection review and case processing.",
+      "Delivered across the stack's front half: React screens, shared design system components and the BFF connecting them to the rules engine.",
+      "Set up an AI-assisted delivery workflow with agent task orchestration and automated code review.",
     ],
+    clients: [VizziaLogo, SeLogerLogo, FinanceToTheMoonLogo],
     stack: [
       "React",
       "TypeScript",
-      "Cursor",
+      "TanStack",
+      "React Aria",
+      "Hono",
+      "Claude Code",
       "Agentic",
       "Astro",
       "Tailwind CSS",
-      "Shadcn",
     ],
   },
   {
@@ -83,64 +86,54 @@ const experiences = [
 ]
 ---
 
-<section
-  id="experience"
-  class="flex w-full scroll-mt-[160px] flex-col content-center justify-between lg:flex-row"
->
-  <div class="top-[160px] mb-8 flex items-center self-start lg:sticky lg:mb-0">
-    <HugeiconsIcon
-      icon={Briefcase02Icon}
-      className="hidden size-24 animate-glow-wander sm:block"
-    />
-    <div
-      class="ml-8 hidden h-16 w-1 rotate-15 rounded-full bg-foreground sm:block"
-    >
-    </div>
-    <hgroup class="sm:ml-8">
-      <h2 class="text-3xl font-bold sm:text-5xl">Experience</h2>
-      <h3 class="text-special">A decade of frontend craft</h3>
-    </hgroup>
-  </div>
-
-  <div class="flex flex-col gap-4 lg:w-[480px]">
+<section id="experience" class="scroll-mt-8">
+  <h2 class="section-label">Experience</h2>
+  <div class="flex flex-col gap-4">
     {
       experiences.map((xp) => (
-        <SpotlightCard client:visible spotlightColor="rgba(192, 132, 252, 0.3)">
-          <Card>
-            <CardHeader>
-              <div class="flex items-center gap-2 text-muted-foreground">
-                <HugeiconsIcon icon={Building03Icon} className="size-4" />
-                <span class="text-xs tracking-wide uppercase">
-                  {xp.company}
-                </span>
-              </div>
-              <CardTitle>{xp.role}</CardTitle>
-              <CardDescription className="flex flex-wrap gap-x-3 gap-y-1">
-                <span class="inline-flex items-center gap-1">
-                  <HugeiconsIcon icon={Calendar03Icon} className="size-3.5" />
-                  {xp.period}
-                </span>
-                <span class="inline-flex items-center gap-1">
-                  <HugeiconsIcon icon={Location01Icon} className="size-3.5" />
-                  {xp.location}
-                </span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <p class="text-sm text-muted-foreground">{xp.summary}</p>
-              <ul class="list-disc space-y-1 pl-5 text-sm">
-                {xp.highlights.map((h) => (
-                  <li>{h}</li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter className="flex flex-wrap gap-1.5">
-              {xp.stack.map((tech) => (
-                <Badge variant="outline">{tech}</Badge>
+        <Card>
+          <CardHeader>
+            <CardAction>
+              <Badge variant="outline">{xp.period}</Badge>
+            </CardAction>
+            <CardTitle>{xp.role}</CardTitle>
+            <CardDescription>
+              <span class="font-medium text-foreground">{xp.company}</span> ·{" "}
+              {xp.location} · {xp.summary}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul class="space-y-1.5 text-sm">
+              {xp.highlights.map((h) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="text-muted-foreground">
+                    —
+                  </span>
+                  {h}
+                </li>
               ))}
-            </CardFooter>
-          </Card>
-        </SpotlightCard>
+            </ul>
+            {xp.clients && (
+              <>
+                <h3 class="mt-5 mb-2.5 font-display text-[15px] tracking-[0.14em] text-muted-foreground uppercase">
+                  Clients &amp; projects
+                </h3>
+                <ul class="grid grid-cols-3 gap-2">
+                  {xp.clients.map((Logo) => (
+                    <li class="grid h-16 place-items-center rounded-[14px] bg-white text-foreground shadow-xs">
+                      <Logo className="h-7 max-w-[72%]" />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </CardContent>
+          <CardFooter className="flex flex-wrap gap-1.5">
+            {xp.stack.map((tech) => (
+              <Badge variant="outline">{tech}</Badge>
+            ))}
+          </CardFooter>
+        </Card>
       ))
     }
   </div>

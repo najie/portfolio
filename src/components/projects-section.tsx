@@ -1,149 +1,82 @@
-import { useRef, useEffect, useState, useCallback } from "react"
+import { useRef } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Blockchain03Icon } from "@hugeicons/core-free-icons"
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-  CardAction,
-} from "./ui/card"
-import { AspectRatio } from "./ui/aspect-ratio"
-import { Button } from "./ui/button"
+  Clock01Icon,
+  CookieIcon,
+  Invoice01Icon,
+  LinkSquare01Icon,
+} from "@hugeicons/core-free-icons"
 import { projects } from "@/projects/registry"
 import { Badge } from "./ui/badge"
+import { TestItCallout } from "./test-it-callout"
 
-interface Line {
-  x1: number
-  y1: number
-  x2: number
-  y2: number
+const icons: Record<string, typeof Clock01Icon> = {
+  pomodoro: Clock01Icon,
+  "cookie-clicker": CookieIcon,
+  "pdf-invoice-editor": Invoice01Icon,
 }
+
+const widgetClass =
+  "glass flex min-h-48 flex-col justify-between gap-4 rounded-3xl p-5 text-left"
 
 const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
-  const hgroupRef = useRef<HTMLElement>(null)
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [lines, setLines] = useState<Line[]>([])
-
-  const updateLines = useCallback(() => {
-    const section = sectionRef.current
-    const hgroup = hgroupRef.current
-    if (!section || !hgroup) return
-
-    const sectionRect = section.getBoundingClientRect()
-    const hgroupRect = hgroup.getBoundingClientRect()
-
-    const startX = hgroupRect.right - sectionRect.left + 16
-    const centerY = hgroupRect.top + hgroupRect.height / 2 - sectionRect.top
-
-    const cards = cardRefs.current.filter(
-      (card): card is HTMLDivElement => card !== null
-    )
-    const gap = 16
-    const totalHeight = (cards.length - 1) * gap
-    const topY = centerY - totalHeight / 2
-
-    const newLines = cards.map((card, i) => {
-      const cardRect = card.getBoundingClientRect()
-      const y1 = topY + i * gap
-      const x2 = cardRect.left - sectionRect.left
-      const y2 = cardRect.top + cardRect.height / 2 - sectionRect.top
-      return { x1: startX, y1, x2, y2 }
-    })
-
-    setLines(newLines)
-  }, [])
-
-  useEffect(() => {
-    updateLines()
-    window.addEventListener("resize", updateLines)
-    return () => window.removeEventListener("resize", updateLines)
-  }, [updateLines])
 
   return (
-    <section
-      id="projects"
-      ref={sectionRef}
-      className="relative flex w-full scroll-mt-[160px] flex-col content-center justify-between lg:flex-row"
-    >
-      <svg className="pointer-events-none absolute inset-0 hidden h-full w-full overflow-visible lg:block">
-        <style>{`
-          @keyframes draw-line {
-            from { clip-path: inset(0 100% 0 0); }
-            to { clip-path: inset(0 0% 0 0); }
-          }
-        `}</style>
-        {lines.map((line, i) => (
-          <line
-            key={i}
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
-            stroke="currentColor"
-            strokeWidth={1}
-            strokeDasharray="4 6"
-            className="text-muted-foreground/30"
-            style={{
-              animation: "draw-line 2s ease forwards",
-            }}
-          />
-        ))}
-      </svg>
-
-      <div className="mb-8 flex items-center lg:mb-0">
-        <HugeiconsIcon
-          icon={Blockchain03Icon}
-          className="hidden size-24 animate-glow-wander sm:block"
-        />
-
-        <div className="ml-8 hidden h-16 w-1 rotate-15 rounded-full bg-foreground sm:block" />
-        <hgroup ref={hgroupRef} className="sm:ml-8">
-          <h2 className="text-3xl font-bold sm:text-5xl">Projects</h2>
-          <h3 className="text-special">Made with passion and care</h3>
-        </hgroup>
-      </div>
-
-      <div className="flex w-full flex-col gap-4 lg:w-[480px]">
-        {projects.map((project, i) => (
-          <Card
-            key={project.slug}
-            ref={(el) => {
-              cardRefs.current[i] = el
-            }}
-          >
-            <CardHeader>
-              {project.soonTM && (
-                <CardAction>
-                  <Badge variant="outline">Coming soon</Badge>
-                </CardAction>
-              )}
-              <CardTitle>{project.title}</CardTitle>
-              <CardDescription>{project.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="grow">
-              {project.thumbnail && (
-                <AspectRatio ratio={16 / 9}>
-                  <img
-                    src={project.thumbnail}
-                    alt={project.title}
-                    className="rounded"
+    <section ref={sectionRef} id="projects" className="relative scroll-mt-8">
+      <TestItCallout sectionRef={sectionRef} />
+      <h2 className="section-label">Projects</h2>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {projects.map((project) => {
+          const content = (
+            <>
+              <span className="flex items-start justify-between">
+                <span className="grid size-11 place-items-center rounded-[14px] bg-white shadow-xs">
+                  <HugeiconsIcon
+                    icon={icons[project.slug]}
+                    className="size-5"
                   />
-                </AspectRatio>
-              )}
-            </CardContent>
-            <CardFooter>
-              <a href={`/projects/${project.slug}`} className="w-full">
-                <Button className="w-full" disabled={project.soonTM}>
-                  View Project
-                </Button>
-              </a>
-            </CardFooter>
-          </Card>
-        ))}
+                </span>
+                {project.url && (
+                  <HugeiconsIcon
+                    icon={LinkSquare01Icon}
+                    className="size-4 text-muted-foreground"
+                  />
+                )}
+              </span>
+              <div>
+                {project.soonTM ? (
+                  <Badge variant="outline">Coming soon</Badge>
+                ) : (
+                  <Badge>Live</Badge>
+                )}
+                <h3 className="mt-1.5 font-display text-2xl leading-none tracking-wide">
+                  {project.title}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {project.description}
+                </p>
+              </div>
+            </>
+          )
+          return project.soonTM ? (
+            <div key={project.slug} className={widgetClass}>
+              {content}
+            </div>
+          ) : (
+            <a
+              key={project.slug}
+              href={project.url ?? `/projects/${project.slug}`}
+              {...(project.url && {
+                target: "_blank",
+                rel: "noreferrer",
+              })}
+              className={`${widgetClass} glass-tap`}
+            >
+              {content}
+            </a>
+          )
+        })}
       </div>
     </section>
   )

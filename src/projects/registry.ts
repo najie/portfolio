@@ -4,6 +4,7 @@ export type Project = {
   description: string
   tags: string[]
   thumbnail?: string
+  url?: string // hosted elsewhere, opens in a new tab
   soonTM: boolean
 }
 
@@ -23,10 +24,11 @@ export const projects: Project[] = [
     soonTM: true,
   },
   {
-    slug: "zod-form",
-    title: "A Form with Zod validation",
-    description: "A form with Zod validation and a nice UI",
-    tags: ["react", "zod", "form"],
-    soonTM: true,
+    slug: "pdf-invoice-editor",
+    title: "Invoice PDF Editor",
+    description: "Retype text on an existing invoice PDF and export it",
+    tags: ["pdf", "browser"],
+    url: "https://najie.github.io/pdf-invoice-editor/",
+    soonTM: false,
   },
 ]

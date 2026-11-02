@@ -1,0 +1,167 @@
+/* "Test it": the word condenses out of frosted glass. It starts blurred in the wallpaper's pool colours,
+   clears through violet into ink, sheds a few flat droplets, then a specular sheen crosses it as the arrow nudges toward the projects. */
+.test-it {
+  container-type: inline-size;
+  --pool-pink: #ff92c8;
+  --pool-sky: #2bbdf5;
+  --pool-lavender: #c9b8ff;
+}
+
+.test-it-word {
+  position: relative;
+  display: block;
+  font-family: var(--font-display);
+  font-size: 13cqi;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: pre;
+  color: var(--foreground);
+}
+
+.test-it-letter {
+  display: inline-block;
+  opacity: 0;
+}
+
+.test-it-speck {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--c);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .test-it[data-revealed] .test-it-letter {
+    --delay: calc(var(--i) * 80ms);
+    animation:
+      test-it-clear 1.5s cubic-bezier(0.16, 1, 0.3, 1) var(--delay) both,
+      test-it-tint 1.5s linear var(--delay) both;
+  }
+
+  .test-it[data-revealed] .test-it-arrow {
+    animation: test-it-nudge 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.9s;
+  }
+
+  .test-it-card-in {
+    animation: test-it-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .test-it[data-revealed] .test-it-speck {
+    animation: test-it-shed 1.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d) both;
+  }
+
+  /* The sheen: the same text, clipped to a white band that sweeps once like light across a glass pane. */
+  .test-it[data-revealed] .test-it-word::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: transparent;
+    background: linear-gradient(
+        100deg,
+        transparent 44%,
+        oklch(1 0 0 / 0.6) 50%,
+        transparent 56%
+      )
+      no-repeat;
+    background-size: 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: test-it-sheen 1.4s cubic-bezier(0.45, 0, 0.2, 1) 1.9s both;
+  }
+}
+
+/* Reduced motion: the word is simply there, no droplets. */
+@media (prefers-reduced-motion: reduce) {
+  .test-it-letter {
+    opacity: 1;
+  }
+}
+
+@keyframes test-it-card-in {
+  from {
+    opacity: 0;
+    translate: 1rem 0;
+  }
+}
+
+@keyframes test-it-clear {
+  from {
+    opacity: 0;
+    filter: blur(18px);
+    translate: 0 0.12em;
+    scale: 1.12;
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes test-it-tint {
+  0% {
+    color: var(--pool-pink);
+    text-shadow: 0 0 0 transparent;
+  }
+  30% {
+    color: var(--pool-sky);
+  }
+  60% {
+    color: var(--accent-ink);
+    text-shadow: 0 0 22px
+      color-mix(in oklch, var(--accent-ink) 40%, transparent);
+  }
+  100% {
+    color: var(--foreground);
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+@keyframes test-it-shed {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 1;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--dx) var(--dy);
+    scale: 0.4;
+  }
+}
+
+@keyframes test-it-sheen {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes test-it-nudge {
+  25%,
+  65% {
+    translate: -4px 0;
+  }
+  45%,
+  100% {
+    translate: 0 0;
+  }
+}
+
+/* BorderGlow ships a hairline border and shadow-md; the callout wears the house glass edge and lift instead. */
+.test-it-card {
+  border-color: transparent;
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.7),
+    0 12px 32px -12px oklch(0.2 0.02 300 / 0.18);
+}

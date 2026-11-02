@@ -3,6 +3,7 @@ import "@/styles/global.css"
 import { CustomCursor } from "@/components/custom-cursor"
 import { Toaster } from "@/components/ui/sonner"
 import { MainLayoutHeader } from "@/components/main-layout-header"
+import Wallpaper from "@/components/wallpaper.astro"
 ---
 
 <html lang="en">
@@ -10,25 +11,15 @@ import { MainLayoutHeader } from "@/components/main-layout-header"
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Astro App</title>
-    <script is:inline>
-      ;(function () {
-        const stored = localStorage.getItem("theme")
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches
-        if (stored === "dark" || (!stored && prefersDark)) {
-          document.documentElement.classList.add("dark")
-        }
-      })()
-    </script>
+    <title>Oui | Jeremy Laurain, Senior Frontend Developer</title>
   </head>
   <body>
+    <Wallpaper />
     <MainLayoutHeader client:load />
 
     <CustomCursor client:load />
     <Toaster client:load />
-    <main class="mx-auto max-w-7xl">
+    <main>
       <slot />
     </main>
   </body>

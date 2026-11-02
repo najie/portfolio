@@ -1,50 +1,34 @@
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 type PomodoroDisplayProps = {
   displayLabel: string
-  isRunning: boolean
-  onStop: () => void
+  showsClock: boolean
+  isFinished: boolean
+  announcement: string
 }
 
 const PomodoroDisplay = ({
   displayLabel,
-  isRunning,
-  onStop,
+  showsClock,
+  isFinished,
+  announcement,
 }: PomodoroDisplayProps) => (
-  <div className="mb-16 text-center">
-    <div
-      className="mb-4 text-2xl font-bold transition-transform duration-300"
-      style={{
-        transform: isRunning ? "translateY(0px)" : "translateY(20px)",
-      }}
+  <div className="flex h-[min(24vw,10rem)] min-h-20 shrink-0 items-end justify-center text-center [@media(max-height:560px)]:h-auto [@media(max-height:560px)]:w-[45%]">
+    <p
+      role="timer"
+      className={cn(
+        "font-display leading-[0.85] tracking-wide whitespace-nowrap tabular-nums",
+        showsClock
+          ? "text-[min(23vw,10rem)] [@media(max-height:560px)]:text-[24vh]"
+          : "text-5xl sm:text-6xl",
+        isFinished && "text-accent-ink"
+      )}
     >
       {displayLabel}
-    </div>
-    <div>
-      <Button
-        type="button"
-        onClick={onStop}
-        tabIndex={isRunning ? 0 : -1}
-        aria-hidden={!isRunning}
-        className="cursor-pointer"
-        style={
-          isRunning
-            ? {
-                opacity: 1,
-                transform: "translateY(0)",
-                transition: "all 0.3s ease",
-                pointerEvents: "auto",
-              }
-            : {
-                opacity: 0,
-                transform: "translateY(-10px)",
-                pointerEvents: "none",
-              }
-        }
-      >
-        Stop
-      </Button>
-    </div>
+    </p>
+    <p aria-live="polite" className="sr-only">
+      {announcement}
+    </p>
   </div>
 )
 

@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "figtree",
+        "createdAt": "2026-11-01T10:59:51.280Z",
+        "reason": "Figtree is DESIGN.md's body face (Figtree Variable); the decision mocks load it from Google Fonts under its plain family name"
+      }
+    ]
+  }
+}
