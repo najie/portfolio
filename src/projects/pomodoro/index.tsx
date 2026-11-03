@@ -45,7 +45,7 @@ const PomodoroApp = () => {
         </Button>
         <div
           data-dragging={pomodoro.isDragging}
-          className="pomodoro-dial relative shrink-0 touch-none"
+          className="pomodoro-dial relative shrink-0 touch-none [-webkit-touch-callout:none]"
           style={
             {
               width: CONTAINER_WIDTH,
