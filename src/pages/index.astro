@@ -5,10 +5,10 @@ import ExperienceSection from "@/components/experience-section.astro"
 ---
 
 <Layout>
-  <div class="mx-auto w-[min(600px,calc(100%-2rem))] pt-6 pb-36">
+  <div class="mx-auto w-[min(600px,calc(100%-2rem))] pt-6 pb-16">
     <IndexHero client:load />
+    <ContactSection client:load />
     <ExperienceSection />
     <ProjectsSection client:load />
-    <ContactSection client:load />
   </div>
 </Layout>

@@ -21,7 +21,7 @@ A senior frontend developer who ships polished, animated, production-grade UI an
 ## Operating Context
 
 - Astro 6 with React islands, Tailwind CSS v4, shadcn/ui components, Hugeicons, Sonner toasts, custom cursor on fine pointers.
-- Routes: `/` (hero, headline, experience, projects, contact) and `/projects/<slug>` (interactive demos, currently Pomodoro; others marked coming soon).
+- Routes: `/` (hero, headline, experience, projects, contact) and `/projects/<slug>` (interactive demos, currently Pomodoro; the other projects link out to their own hosted demos).
 - Project registry in `src/projects/registry.ts`; experience data inline in `src/components/experience-section.astro`.
 
 ## Capabilities and Constraints
@@ -44,7 +44,7 @@ A senior frontend developer who ships polished, animated, production-grade UI an
 ## Evidence on Hand
 
 - Real experience data: Oui (2026–present, led by the Vizzia mission), AVIV Group (2020–2026), Interencheres (2016–2020) with highlights and stacks.
-- Two shipped projects: the Pomodoro timer (on this site) and Invoice PDF Editor (external, https://najie.github.io/pdf-invoice-editor/). Cookie Clicker is not built; keep it "coming soon", no fabricated screenshots.
+- Three shipped projects: the Pomodoro timer (on this site), Invoice PDF Editor (external, https://najie.github.io/pdf-invoice-editor/) and Finance to the Moon, a personal portfolio app (external, https://najie.github.io/finance-to-the-moon/). Cookie Clicker was dropped. No fabricated screenshots.
 - Logos on the freelance card, under "Clients & projects": Vizzia (freelance mission), SeLoger (AVIV period) and Finance to the Moon (personal app). Keep that label, since only Vizzia is a freelance client.
 - No testimonials or metrics exist; do not invent any, and add no other logos.
 

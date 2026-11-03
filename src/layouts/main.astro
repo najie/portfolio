@@ -2,7 +2,6 @@
 import "@/styles/global.css"
 import { CustomCursor } from "@/components/custom-cursor"
 import { Toaster } from "@/components/ui/sonner"
-import { MainLayoutHeader } from "@/components/main-layout-header"
 import Wallpaper from "@/components/wallpaper.astro"
 ---
 
@@ -15,8 +14,6 @@ import Wallpaper from "@/components/wallpaper.astro"
   </head>
   <body>
     <Wallpaper />
-    <MainLayoutHeader client:load />
-
     <CustomCursor client:load />
     <Toaster client:load />
     <main>

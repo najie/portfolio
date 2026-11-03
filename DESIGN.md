@@ -141,17 +141,6 @@ components:
     rounded: "{rounded.pill}"
     padding: "0 12px"
     height: "36px"
-  nav-tab-bar:
-    backgroundColor: "{colors.glass-fill}"
-    rounded: "{rounded.full}"
-    padding: "6px"
-  nav-tab:
-    textColor: "{colors.ink}"
-    typography: "{typography.nav}"
-    rounded: "{rounded.full}"
-    padding: "12px 16px"
-  nav-tab-active:
-    backgroundColor: "oklch(1 0 0 / 0.8)"
   section-label:
     textColor: "{colors.ink-muted}"
     typography: "{typography.label}"
@@ -166,7 +155,7 @@ components:
 
 The home page behaves like a phone's lock screen laid on a sheet of paper: a wordmark at the top, a greeting at wake-screen scale, and beneath it a single column of widgets. Nothing structural sits left or right of the column (the one exception is the decorative desktop "Test it" callout in the right gutter); the page is one 600px-wide spine, and every container on it is the same material, Liquid Glass. The ground is a calm lavender-grey paper with a fine multiply noise and three large blurred colour pools (pink, sky, lavender) that the glass refracts. The pools are what the glass is for; they never cover the page.
 
-Density is low and the rhythm is the widget stack's: a small tracked label, then one or more glass panes with a 16px gap. Type carries the hierarchy in two voices only. Bebas Neue caps do the greeting, the headline quote, widget titles, the section labels and the tab bar; Figtree does everything readable. Emphasis is one solid violet ink on two words per page. The page's single glowing object is the hero CTA; every other shadow is the glass's own soft lift.
+Density is low and the rhythm is the widget stack's: a small tracked label, then one or more glass panes with a 16px gap. Type carries the hierarchy in two voices only. Bebas Neue caps do the greeting, the headline quote, widget titles and the section labels; Figtree does everything readable. Emphasis is one solid violet ink on two words per page. The page's single glowing object is the hero CTA; every other shadow is the glass's own soft lift.
 
 Confirmed rejections: a full-page gradient ground, the left-title / right-card scaffold, dark mode, and any second material next to the glass.
 
@@ -176,7 +165,6 @@ Confirmed rejections: a full-page gradient ground, the left-title / right-card s
 - Paper ground with noise and three blurred colour pools; project pages fade the pools to 12%.
 - Bebas Neue caps for every heading, label and tab; Figtree body.
 - Violet `accent-ink` as the only chromatic emphasis in text; BorderGlow on the hero CTA (and, by request, the desktop "Test it" callout) as the only glow.
-- Fixed bottom glass tab bar whose active pill follows the section in view.
 
 ## Colors
 
@@ -189,7 +177,7 @@ A near-white lavender paper, zinc ink, white chips and glass fills, three pastel
 - **Pool Pink / Pool Sky / Pool Lavender** (`pool-pink`, `pool-sky`, `pool-lavender`): three slowly drifting, 90px-blurred discs in the wallpaper at 45%, 30% and 35% opacity, resting behind the greeting, to its right, and at 60vh. They exist to be refracted through glass; they are never applied to a component.
 - **Glow Violet / Glow Pink / Glow Sky** (`glow-violet`, `glow-pink`, `glow-sky`): the BorderGlow mesh on the hero CTA only.
 - **Selection Pink** (`selection-pink`): text selection highlight.
-- **Particle Pink / Particle Lavender / Particle Sky** (`particle-pink`, `particle-lavender`, `particle-sky`): the flat circles drifting out from behind the contact card, at 60% opacity at most. Pale on purpose: they tint, never glow.
+- **Particle Pink / Particle Lavender / Particle Sky** (`particle-pink`, `particle-lavender`, `particle-sky`): the flat circles drifting out from behind the contact card, at 80% opacity at most. Pale on purpose: they tint, never glow.
 
 ### Neutral
 - **Paper** (`paper`): page ground under the wallpaper noise; also the `--background` token.
@@ -218,21 +206,21 @@ A near-white lavender paper, zinc ink, white chips and glass fills, three pastel
 - **Display** (400, clamp(4rem, 12vw, 8rem), 0.95): the greeting "Hi / I'm Jeremy Laurain" only. Centred, `text-wrap: balance`, enters with the text-reveal animation.
 - **Headline** (400, 1rem, 0.05em): the single quote directly under the top wordmark, on one line.
 - **Title** (400, 1.5rem, 1.0): widget titles: card role, project name.
-- **Nav** (400, 1.125rem, 0.05em): tab bar labels, the project-page "Retour" link, and at 1.25rem the hero CTA.
+- **Nav** (400, 1.125rem, 0.05em): the project-page "Retour" link, and at 1.25rem the hero CTA.
 - **Label** (400, 15px, 0.14em, uppercase, muted): the `section-label` above each widget group.
 - **Meta** (500, 15px, 0.025em, muted): the "Senior Frontend Developer · Paris · Freelance" line.
 - **Body** (400, 1rem, 1.5): the hero sub line is 1.125rem; widget copy, highlights, row titles and chips are **Body Small** (0.875rem, chips at 0.75rem / 500).
 
 ### Named Rules
-**The Two Voices Rule.** Bebas Neue is for things you glance at (greeting, titles, labels, tabs); Figtree is for things you read. No third face, no weight games in Bebas (it has one), no italics.
+**The Two Voices Rule.** Bebas Neue is for things you glance at (greeting, titles, labels, buttons); Figtree is for things you read. No third face, no weight games in Bebas (it has one), no italics.
 
-**The Loose Caps Rule.** Bebas is never set at `normal` tracking. Headings take 0.025em, tabs 0.05em, labels 0.14em.
+**The Loose Caps Rule.** Bebas is never set at `normal` tracking. Headings take 0.025em, buttons 0.05em, labels 0.14em.
 
 ## Layout
 
-One centred column, `min(600px, 100% - 2rem)` wide, 24px top padding and 144px bottom padding so the last widget clears the fixed tab bar. Inside the column the hero is centred text: wordmark (36px tall), the headline quote 8px below it, 40px gap, meta line, greeting, sub line, CTA at 32px below, then 24px before the first widget group. Each widget group starts with a `section-label` (28px above, 10px below, 4px side inset) and stacks its panes with a 16px gap. Experience is three full-width cards; Projects is a 2-column grid becoming 3 columns at sm (640px), each tile at least 192px tall; Contact is one pane under its own `section-label`, like every other group. From xl (1280px) the right gutter beside Projects holds the decorative "Test it" callout. Sections carry `scroll-margin-top: 2rem` for the tab bar's smooth scroll.
+One centred column, `min(600px, 100% - 2rem)` wide, 24px top padding and 64px bottom padding. Inside the column the hero is centred text: wordmark (36px tall), the headline quote 8px below it, 40px gap, meta line, greeting, sub line, CTA at 32px below, then 24px before the first widget group. Each widget group starts with a `section-label` (28px above, 10px below, 4px side inset) and stacks its panes with a 16px gap. The groups run Contact, Experience, Projects. Contact is one pane under its own `section-label`, like every other group; Experience is three full-width cards; Projects is a 2-column grid becoming 3 columns at sm (640px), each tile at least 192px tall. From xl (1280px) the right gutter beside Projects holds the decorative "Test it" callout. Sections carry `scroll-margin-top: 2rem` for the hero CTA's smooth scroll to Projects. There is no fixed navigation: the page is short enough to scroll.
 
-The tab bar is fixed 20px from the bottom, centred, and hides its text labels below sm so only three icons remain. Project pages reuse the same glass in a top-left header pill (24px from top, 16px from the left, 32px at md) and hand the viewport to the demo (`100dvh`, overflow hidden) over a quieted wallpaper.
+Project pages reuse the same glass in a top-left header pill (24px from top, 16px from the left, 32px at md) and hand the viewport to the demo (`100dvh`, overflow hidden) over a quieted wallpaper.
 
 ## Elevation & Depth
 
@@ -242,7 +230,6 @@ Depth is material, not shadow. Everything above the paper is the same translucen
 - **Glass lift** (`box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.7), 0 12px 32px -12px oklch(0.2 0.02 300 / 0.18)`): every `.glass` pane at rest.
 - **Glass lifted** (`box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.9), 0 24px 50px -22px oklch(0.3 0.08 300 / 0.35)`): `.glass-tap` on hover.
 - **Tile shadow** (`shadow-xs`, `0 1px 2px rgb(0 0 0 / 0.05)`): the white symbol tile inside a project widget, the client tiles and the Pomodoro notch chips.
-- **Active tab** (`0 6px 16px -8px rgb(0 0 0 / 0.25)`): the lit pill in the tab bar.
 - **CTA glow** (BorderGlow, 13-layer hsl glow at 0.6 intensity, 40px radius, plus `shadow-md`): the hero CTA only.
 
 ### Named Rules
@@ -252,7 +239,7 @@ Depth is material, not shadow. Everything above the paper is the same translucen
 
 ## Shapes
 
-Everything is rounded from one base radius of 14px (`--radius: 0.875rem`). Inside widgets, the symbol tile is exactly that base (14px, a rounded square, echoing the O of the wordmark). Contact rows are the 1.8x step (25.2px); experience cards, project widgets and the contact pane are the 2.2x step (30.8px); chips, shadcn buttons and the project-page header are the 2.6x step (36.4px), which on their heights reads as a full pill. The tab bar, its tabs and the CTA are true pills. There are no square corners and no hairline strokes except the horizontal separators between contact rows. The "Oui" wordmark follows the same geometry: three equal 7-unit strokes in a 60x100 box, the O a rounded rectangle (rx 7), u and i at a lower cap height, set in `currentColor`.
+Everything is rounded from one base radius of 14px (`--radius: 0.875rem`). Inside widgets, the symbol tile is exactly that base (14px, a rounded square, echoing the O of the wordmark). Contact rows are the 1.8x step (25.2px); experience cards, project widgets and the contact pane are the 2.2x step (30.8px); chips, shadcn buttons and the project-page header are the 2.6x step (36.4px), which on their heights reads as a full pill. The CTA is a true pill. There are no square corners and no hairline strokes except the horizontal separators between contact rows. The "Oui" wordmark follows the same geometry: three equal 7-unit strokes in a 60x100 box, the O a rounded rectangle (rx 7), U and I at the same full height as the O, set in `currentColor`.
 
 ## Components
 
@@ -273,30 +260,32 @@ Glass widgets that read like lock-screen tiles: generous radius, no strokes, con
 ### Cards / Containers
 - **Experience card:** `.glass`, radius 30.8px, 24px vertical and horizontal padding, 24px gap between header, content and footer. Header is a grid with the period chip in the top-right, Bebas 1.5rem role, 0.875rem muted description with the company in medium ink. Highlights are an em-dash list at 0.875rem; footer is a wrapped row of chips at 6px gap.
 - **Client tiles:** on the freelance experience card only, under a small tracked "Clients & projects" label: three equal white tiles (64px tall, 14px radius, `shadow-xs`) in a 3-column grid with an 8px gap, each holding one logo 28px tall in ink. Logos are always monochrome, never brand-coloured, and tiles are not links.
-- **Project widget:** `.glass`, radius 30.8px, 20px padding, min-height 192px, space-between column: 44px white symbol tile (14px radius, 20px Hugeicons stroke icon) on top; status chip, Bebas 1.5rem title and 0.875rem muted description at the bottom. Live widgets are links with `.glass-tap`; external ones open in a new tab and show the 16px link icon at top right. Coming-soon widgets are static panes.
+- **Project widget:** `.glass`, radius 30.8px, 20px padding, min-height 192px, top-aligned column with a 16px gap: 44px white symbol tile (14px radius, 20px Hugeicons stroke icon), then status chip, Bebas 1.5rem title and 0.875rem muted description, so every status chip in a row lines up and leftover height falls at the bottom. Live widgets are links with `.glass-tap`; external ones open in a new tab and show the 16px link icon at top right. Coming-soon widgets are static panes.
 - **Contact pane:** `.glass`, radius 30.8px, 16px padding, headed from outside by the "Let's get in touch" `section-label`, three rows (16px/14px padding, radius 25.2px, 16px icon, 0.875rem/500 title and muted description) separated by `hairline` with 8px margins. Link rows tint `muted` on hover.
 - **Shadow strategy:** glass lift at rest, glass lifted on hover for `.glass-tap` surfaces (see Elevation & Depth).
 - **Border:** none; the even 1px inset white rim only.
 
 ### Navigation
-- **Tab bar:** fixed bottom-centre glass pill, 6px padding, 4px gap, z-index 99. Each tab is a pill with 16px/12px padding, 20px icon and a Bebas 1.125rem label at 0.05em; labels disappear below sm. Hover tints 50% white; the active tab (the last section whose top has crossed a line 40% down the viewport; over the final half viewport of scroll the line slides to the bottom edge so a short last section still lights up) fills 80% white with the active-tab shadow, transitioning background and shadow over 300ms. Clicking smooth-scrolls to the section. The rule lives in `src/lib/scroll-spy.ts`.
 - **Project header:** fixed top-left glass pill (radius 36.4px, 6px padding, 16px left inset) holding the 32px wordmark link and the ghost "Retour" button.
 
 ### Contact particles
-A canvas under all page content (`z-index: -1`) reaching 140px past the contact card. Flat transparent circles in pastel pink `#f9d3e4`, lavender `#dfd5fa` and sky `#cbe8f8`, at 60% opacity at most, with no rim, highlight or glow. Each one leaves the card's centre, travels straight out behind the glass, grows as it goes and fades quadratically past the edge while slowing down. They are the one sanctioned exception to the Pools Stay Under Rule. The loop stops offscreen, and reduced motion shows one still frame.
+A canvas under all page content (`z-index: -1`) reaching 140px past the contact card. Flat transparent circles in pastel pink `#f9d3e4`, lavender `#dfd5fa` and sky `#cbe8f8`, at 80% opacity at most, with no rim, highlight or glow. Each one leaves the card's centre, travels straight out behind the glass, grows as it goes and fades quadratically past the edge while slowing down. They are the one sanctioned exception to the Pools Stay Under Rule. They wait out the "Try it" play in each motion cycle: they fade in over 700ms 4s into the cycle, while the wallpaper is still settling, fade out before the next cycle starts. Paused, the field freezes and resumes where it was. The loop stops offscreen, and reduced motion shows one still frame.
 
 ### "Test it" callout (desktop)
 From `xl` (1280px), a glass card sits 32px into the right gutter of the Projects section, vertically centred on the widget grid. It is built like a project widget turned on its side: `.glass` fill, edge and lift, 30.8px radius, 20px padding, the 44px white symbol tile (14px radius, `shadow-xs`) holding a 20px Hugeicons left arrow that points at the projects, then a 16px gap and "Test it" in Bebas Neue at 13cqi of the gutter (about 36-54px). This is the one exception to the Loose Caps Rule: it is set tight at -0.02em. It is decorative (`aria-hidden`, no pointer events), so it never pretends to be a button.
 
 The card is a BorderGlow carrying the hero CTA's violet/pink/sky mesh at 0.5 intensity, the user-requested second exception to the One Glow Rule: its edge sweeps on each play and follows a nearby pointer. Its stock hairline border and `shadow-md` are replaced by the glass edge and lift.
 
-It plays when 60% of the section is visible and replays every 10s, but only while the section stays in view and the tab is visible. The card slides in from 1rem on the first play only. Letters condense out of frosted glass, staggered 80ms. Over 1.5s each one goes from an 18px blur at 112% scale to sharp, while its colour runs from pool pink to sky, then `accent-ink` with a soft `accent-ink` glow at 40%, then settles on ink. Eight flat 2-4px droplets in the pool colours, like the contact particles, drift a few pixels off the word and fade as it clears. At 1.9s a single white specular sheen crosses the letters left to right while the arrow nudges 4px toward the projects twice. With reduced motion the word is shown still, with no droplets, glow sweep, nudge or replay.
+It is shown from page load and plays at the start of every motion cycle, together with the wallpaper surge; replays skip while the Projects section is offscreen or the tab is hidden. The card slides in from 1rem on the first play only. Letters condense out of frosted glass, staggered 80ms. Over 1.5s each one goes from an 18px blur at 112% scale to sharp, while its colour runs from pool pink to sky, then `accent-ink` with a soft `accent-ink` glow at 40%, then settles on ink. Eight flat 2-4px droplets in the pool colours, like the contact particles, drift a few pixels off the word and fade as it clears. At 1.9s a single white specular sheen crosses the letters left to right while the arrow nudges 4px toward the projects twice. With reduced motion the word is shown still, with no droplets, glow sweep, nudge or replay.
 
 ### Pomodoro dial
 One glass pane (`rounded-3xl`, max 600px) under a Bebas clock of up to 160px. The dial stays neutral: reached arcs and the cable are `foreground`, unreached arcs `muted-foreground` at 60%, and notch labels are small white chips that double as preset buttons. `accent-ink` appears only on "Time's up". The lever is a white 30px bead that swings on a damped curve when released, then retracts to the pivot as time runs out.
 
 ### Wallpaper (signature)
-A fixed, non-interactive layer at z-index -10: `paper` ground, a 160px tiled SVG fractal-noise texture at 60% opacity in multiply, and three absolutely positioned blurred discs (`filter: blur(90px)`, radius 50%): 520px pink at 45% high and left of centre, 420px sky at 30% to the right, 600px lavender at 35% centred at 60vh. Each pool drifts on three unsynced compositor loops (sway, orbit, stretch). On load the drift surges to 8x over 1.2s, then settles to its slow pace over 12s; with reduced motion the pools hold still at rest. The `quiet` variant drops all pools to 12% so a project demo stays legible.
+A fixed, non-interactive layer at z-index -10: `paper` ground, a 160px tiled SVG fractal-noise texture at 60% opacity in multiply, and three absolutely positioned blurred discs (`filter: blur(90px)`, radius 50%): 520px pink at 45% high and left of centre, 420px sky at 30% to the right, 600px lavender at 35% centred at 60vh. Each pool drifts on three unsynced compositor loops (sway, orbit, stretch). At the start of each 20s motion cycle the pools surge: the drift speeds up to 7x over 1.2s while the pools sharpen to a 12px blur, then over 12s they slow back to their pace and soften to 90px. The page opens on that sharp, fast state; with reduced motion the pools hold still at rest. The `quiet` variant drops all pools to 12% so a project demo stays legible.
+
+### Motion clock
+The wallpaper surge, the "Try it" replay and the contact particles share one clock in `src/lib/motion-clock.ts`, so changing a timing there keeps them in step. A 20s cycle starts at page load: 0-13.2s the wallpaper surges (1.2s rise, 12s settle) and "Try it" replays at 0s for 4s; from 4s until 0.7s before the next cycle the particles run, over the wallpaper's settle. The particles and "Try it" never play together.
 
 ### Toast
 Sonner, light theme, bottom-centre; popover white fill, `hairline` border, 14px radius, Hugeicons status glyphs at 16px / stroke 2. Fired on email copy.

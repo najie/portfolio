@@ -58,29 +58,34 @@
   .wallpaper .pool {
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
+    /* the speed script sharpens the pools while they surge and lets them soften back as they slow */
+    filter: blur(var(--pool-blur, 90px));
   }
   /* Each pool mixes three unsynced motions, so the blobs melt into new shapes and the loop never reads as a loop. */
   .wallpaper .pool:nth-child(1) {
-    --sway: 12vw 9vh;
+    --sway: 16vw 12vh;
     --stretch: 1.25 0.85;
-    --durations: 11s, 31s, 9s;
-    transform-origin: 50% 72%;
+    --durations: 9s, 25s, 7s;
+    transform-origin: 50% 80%;
   }
   .wallpaper .pool:nth-child(2) {
-    --sway: -15vw 15vh;
+    --sway: -20vw 20vh;
     --stretch: 0.8 1.25;
-    --durations: 14s, 23s, 10s;
+    --durations: 11s, 19s, 8s;
     --orbit-direction: reverse;
-    transform-origin: 30% 40%;
+    transform-origin: 22% 36%;
   }
   .wallpaper .pool:nth-child(3) {
-    --sway: 15vw -12vh;
+    --sway: 20vw -16vh;
     --stretch: 1.3 0.9;
-    --durations: 16s, 37s, 12s;
-    transform-origin: 65% 35%;
+    --durations: 13s, 29s, 10s;
+    transform-origin: 72% 28%;
   }
   @media (prefers-reduced-motion: no-preference) {
+    /* open sharp from the first paint, before the speed script takes over */
+    .wallpaper {
+      --pool-blur: 12px;
+    }
     .wallpaper .pool {
       animation-name: pool-sway, pool-orbit, pool-stretch;
       animation-duration: var(--durations);

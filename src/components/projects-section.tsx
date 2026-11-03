@@ -2,9 +2,9 @@ import { useRef } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Clock01Icon,
-  CookieIcon,
   Invoice01Icon,
   LinkSquare01Icon,
+  Rocket01Icon,
 } from "@hugeicons/core-free-icons"
 import { projects } from "@/projects/registry"
 import { Badge } from "./ui/badge"
@@ -12,12 +12,12 @@ import { TestItCallout } from "./test-it-callout"
 
 const icons: Record<string, typeof Clock01Icon> = {
   pomodoro: Clock01Icon,
-  "cookie-clicker": CookieIcon,
+  "finance-to-the-moon": Rocket01Icon,
   "pdf-invoice-editor": Invoice01Icon,
 }
 
 const widgetClass =
-  "glass flex min-h-48 flex-col justify-between gap-4 rounded-3xl p-5 text-left"
+  "glass flex min-h-48 flex-col gap-4 rounded-3xl p-5 text-left"
 
 const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null)

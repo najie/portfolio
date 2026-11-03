@@ -17,11 +17,13 @@ export const projects: Project[] = [
     soonTM: false,
   },
   {
-    slug: "cookie-clicker",
-    title: "Cookie Clicker",
-    description: "A nice animated minimalistic clicker game",
-    tags: ["react", "animations"],
-    soonTM: true,
+    slug: "finance-to-the-moon",
+    title: "Finance to the Moon",
+    description:
+      "Tracks my crypto and stock portfolio and suggests the next moves",
+    tags: ["finance", "browser"],
+    url: "https://najie.github.io/finance-to-the-moon/",
+    soonTM: false,
   },
   {
     slug: "pdf-invoice-editor",

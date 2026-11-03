@@ -20,25 +20,44 @@ const { quiet = false } = Astro.props
 </div>
 
 <script>
-  // The drift itself is CSS; this only shapes its speed: surge on load, then settle into the slow loop.
-  const PEAK_RATE = 8
-  const RISE_MS = 1200
-  const SETTLE_MS = 12000
+  import {
+    SURGE_MS,
+    SURGE_RISE_MS,
+    SURGE_SETTLE_MS,
+    cycleTime,
+    msToNextCycle,
+  } from "@/lib/motion-clock"
 
-  const drifts =
-    document.querySelector(".wallpaper")?.getAnimations({ subtree: true }) ?? []
-  const start = performance.now()
+  // The drift itself is CSS; this shapes its speed and blur on the shared motion clock. Each cycle opens with
+  // a surge: the pools rush in every direction while turning sharp, then slow and soften into the slow pace.
+  const PEAK_RATE = 7
+  const SHARP_BLUR = 12
+  const SOFT_BLUR = 90
+
+  const wallpaper = document.querySelector<HTMLElement>(".wallpaper")
+  const drifts = wallpaper?.getAnimations({ subtree: true }) ?? []
 
   function tick(now: number) {
-    const t = now - start
-    const done = t >= RISE_MS + SETTLE_MS
-    const surge =
-      t < RISE_MS ? (t / RISE_MS) ** 2 : (1 - (t - RISE_MS) / SETTLE_MS) ** 2
-    const rate = done ? 1 : 1 + (PEAK_RATE - 1) * surge
-    for (const drift of drifts) drift.playbackRate = rate
-    if (!done) requestAnimationFrame(tick)
+    const t = cycleTime(now)
+    const surging = t < SURGE_MS
+    const surge = !surging
+      ? 0
+      : t < SURGE_RISE_MS
+        ? (t / SURGE_RISE_MS) ** 2
+        : (1 - (t - SURGE_RISE_MS) / SURGE_SETTLE_MS) ** 2
+    // the page opens sharp, so the very first rise holds it there instead of sharpening from soft
+    const opening = now < SURGE_RISE_MS
+    const sharpness = opening ? 1 : surge
+    for (const drift of drifts) drift.playbackRate = 1 + (PEAK_RATE - 1) * surge
+    wallpaper?.style.setProperty(
+      "--pool-blur",
+      `${SOFT_BLUR - (SOFT_BLUR - SHARP_BLUR) * sharpness}px`
+    )
+    if (surging) requestAnimationFrame(tick)
+    // slow pace until the next cycle, without a frame loop
+    else setTimeout(() => requestAnimationFrame(tick), msToNextCycle(now))
   }
 
-  // Empty under prefers-reduced-motion, where the CSS drift is off.
+  // Empty under prefers-reduced-motion, where the CSS drift is off and the pools keep their full blur.
   if (drifts.length) requestAnimationFrame(tick)
 </script>

@@ -1,6 +1,5 @@
 export * from "./react-bits"
 export * from "./typewriter-heading"
-export * from "./main-layout-header"
 export * from "./project-layout-header.astro"
 export * from "./contact-section.tsx"
 export * from "./projects-section.tsx"

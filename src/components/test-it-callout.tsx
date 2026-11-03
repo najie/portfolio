@@ -2,6 +2,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type RefObject,
 } from "react"
@@ -9,11 +10,10 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons"
 import { BorderGlow } from "./react-bits"
 import { cn } from "@/lib/utils"
+import { msToNextCycle } from "@/lib/motion-clock"
 import "./test-it-callout.css"
 
-const TEXT = "Test it"
-const VISIBLE_ENOUGH = 0.6
-const REPLAY_MS = 10_000
+const TEXT = "Try it"
 const DESKTOP = "(min-width: 80rem)"
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)"
 
@@ -69,13 +69,25 @@ const SPECKS = [
   { x: "94%", y: "52%", dx: "15px", dy: "-4px", c: "--pool-sky", s: 2, d: 880 },
 ]
 
-// Desktop-only pointer to the project widgets: plays when the projects come into view, then replays every 10s while they stay in view.
+// below xl the callout is hidden, so it never mounts there
+const subscribeDesktop = (onChange: () => void) => {
+  const query = matchMedia(DESKTOP)
+  query.addEventListener("change", onChange)
+  return () => query.removeEventListener("change", onChange)
+}
+
+// Desktop-only pointer to the project widgets: shown from page load and played at the start of every
+// motion cycle, together with the wallpaper surge. Replays skip while the section is offscreen.
 const TestItCallout = ({
   sectionRef,
 }: {
   sectionRef: RefObject<HTMLElement | null>
 }) => {
-  const [revealed, setRevealed] = useState(false)
+  const revealed = useSyncExternalStore(
+    subscribeDesktop,
+    () => matchMedia(DESKTOP).matches,
+    () => false
+  )
   // bumping the key remounts the card, which restarts the CSS reveal and BorderGlow's mount sweep
   const [cycle, setCycle] = useState(0)
   const inView = useRef(false)
@@ -83,26 +95,24 @@ const TestItCallout = ({
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // below xl the callout is hidden, so it never starts there
-        inView.current =
-          entry.intersectionRatio >= VISIBLE_ENOUGH &&
-          matchMedia(DESKTOP).matches
-        if (inView.current) setRevealed(true)
-      },
-      { threshold: [0, VISIBLE_ENOUGH] }
-    )
+    const observer = new IntersectionObserver(([entry]) => {
+      inView.current = entry.isIntersecting
+    })
     observer.observe(section)
     return () => observer.disconnect()
   }, [sectionRef])
 
   useEffect(() => {
     if (!revealed || matchMedia(REDUCED_MOTION).matches) return
-    const id = setInterval(() => {
-      if (inView.current && !document.hidden) setCycle((c) => c + 1)
-    }, REPLAY_MS)
-    return () => clearInterval(id)
+    let id: ReturnType<typeof setTimeout>
+    const schedule = () => {
+      id = setTimeout(() => {
+        if (inView.current && !document.hidden) setCycle((c) => c + 1)
+        schedule()
+      }, msToNextCycle())
+    }
+    schedule()
+    return () => clearTimeout(id)
   }, [revealed])
 
   return (

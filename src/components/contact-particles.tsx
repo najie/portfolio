@@ -3,13 +3,15 @@ import {
   getParticleOpacity,
   pointOnRoundedRect,
 } from "./contact-particles.utils"
+import { PARTICLES_FADE_MS, isQuiet } from "@/lib/motion-clock"
 
 const COLORS = ["#f9d3e4", "#dfd5fa", "#cbe8f8"] // pastels of the wallpaper pools
 const CARD_RADIUS = 30.8 // rounded-3xl
 const REACH_PX = 140 // stays inside the page's bottom padding, so scroll height holds
 const PARTICLE_SPACING = 12
-const MAX_OPACITY = 0.6
+const MAX_OPACITY = 0.8
 const START_SCALE = 0.3
+const QUIET_CHECK_MS = 250
 
 type Particle = {
   directionX: number
@@ -32,9 +34,12 @@ const ContactParticles = () => {
     if (!canvas || !card || !context) return
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reducedMotion) canvas.style.opacity = "1"
     let particles: Particle[] = []
     let frame = 0
     let lastTime = 0
+    let onScreen = false
+    let pauseTimer: ReturnType<typeof setTimeout> | undefined
 
     const spawn = (width: number, height: number): Particle => {
       // aiming at an even point on the outline keeps all sides equally busy
@@ -101,14 +106,31 @@ const ContactParticles = () => {
     }
 
     const start = () => {
+      clearTimeout(pauseTimer)
+      canvas.style.opacity = "1"
       if (frame || reducedMotion) return
       lastTime = performance.now()
       frame = requestAnimationFrame(step)
     }
 
     const stop = () => {
+      clearTimeout(pauseTimer)
       cancelAnimationFrame(frame)
       frame = 0
+    }
+
+    // the field fades out and freezes while the page's bigger motion plays, then picks up where it was
+    const pause = () => {
+      if (canvas.style.opacity === "0") return
+      canvas.style.opacity = "0"
+      if (frame) pauseTimer = setTimeout(stop, PARTICLES_FADE_MS)
+    }
+
+    const sync = () => {
+      if (reducedMotion) return
+      if (onScreen && isQuiet()) start()
+      else if (onScreen) pause()
+      else stop()
     }
 
     const layout = () => {
@@ -132,13 +154,15 @@ const ContactParticles = () => {
     resizeObserver.observe(card)
 
     const visibilityObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) start()
-      else stop()
+      onScreen = entry.isIntersecting
+      sync()
     })
     visibilityObserver.observe(canvas)
+    const quietCheck = setInterval(sync, QUIET_CHECK_MS)
 
     return () => {
       stop()
+      clearInterval(quietCheck)
       resizeObserver.disconnect()
       visibilityObserver.disconnect()
     }
@@ -148,7 +172,9 @@ const ContactParticles = () => {
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none absolute -inset-y-35 left-1/2 -z-1 h-[calc(100%+17.5rem)] w-[min(100vw,calc(100%+17.5rem))] -translate-x-1/2"
+      // hidden until the motion clock first allows the particles (shown at once, still, with reduced motion)
+      style={{ transitionDuration: `${PARTICLES_FADE_MS}ms`, opacity: 0 }}
+      className="pointer-events-none absolute -inset-y-35 left-1/2 -z-1 h-[calc(100%+17.5rem)] w-[min(100vw,calc(100%+17.5rem))] -translate-x-1/2 transition-opacity"
     />
   )
 }
