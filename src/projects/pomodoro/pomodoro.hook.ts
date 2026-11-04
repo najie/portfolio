@@ -148,7 +148,11 @@ const usePomodoro = () => {
     if (event.button !== 0 || dragRef.current) return
     event.preventDefault()
     unlockAudio()
-    event.currentTarget.setPointerCapture(event.pointerId)
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // WebKit can throw NotFoundError; touch is implicitly captured anyway, so keep dragging
+    }
 
     if (isRunning) stopTicker()
     setIsFinished(false)
