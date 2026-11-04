@@ -14,6 +14,13 @@ import { usePomodoro } from "./pomodoro.hook"
 import { CONTAINER_HEIGHT, CONTAINER_WIDTH } from "./utils"
 import "./pomodoro.css"
 
+// iOS Safari only routes touch drags to the page where a native non-passive listener sits on a real box (React listens on the display:contents astro-island)
+const blockTouchScroll = (dial: HTMLDivElement | null) => {
+  const block = (event: TouchEvent) => event.preventDefault()
+  dial?.addEventListener("touchmove", block, { passive: false })
+  return () => dial?.removeEventListener("touchmove", block)
+}
+
 const PomodoroApp = () => {
   const pomodoro = usePomodoro()
   const { distance, tension } = pomodoro
@@ -44,6 +51,7 @@ const PomodoroApp = () => {
           Stop
         </Button>
         <div
+          ref={blockTouchScroll}
           data-dragging={pomodoro.isDragging}
           className="pomodoro-dial relative shrink-0 touch-none [-webkit-touch-callout:none]"
           style={
